@@ -7,6 +7,7 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
+  AsyncStorage,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
@@ -77,12 +78,16 @@ export default function ProfileScreen() {
   const dispatch = useDispatch();
   const address: any = useGetAddress();
   let getProfile: any = useGetProfile(userData?.user?.id);
+  let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
 
-  console.log("getProfile", JSON.stringify(getProfile));
   useFocusEffect(
     React.useCallback(() => {
       getProfile.refetch();
       address.refetch();
+      setImagePath(base_url + getProfile?.data.data[0].image);
+      // setTimeout(() => {
+      //   setImagePath(base_url + getProfile?.data.data[0].image);
+      // }, 100);
     }, [])
   );
 
@@ -182,10 +187,7 @@ export default function ProfileScreen() {
     },
   });
   const [imagePath, setImagePath] = useState<string>("");
-  const imageLocation =
-    imagePath && imagePath.length > 0
-      ? imagePath
-      : "../../assets/imgs/women.png";
+
   function openImagePicker() {
     ImagePicker.openPicker({
       width: 63,
@@ -194,8 +196,43 @@ export default function ProfileScreen() {
     }).then((image: { path: React.SetStateAction<string> }) => {
       //@ts-ignore
       setImagePath(image.path);
+      postImage();
     });
   }
+  console.log("image path is", imagePath);
+  async function postImage() {
+    var form_data = new FormData();
+    form_data.append("image", {
+      uri: imagePath,
+      name: "image.jpg",
+      type: "image/jpg",
+    });
+    form_data.append("user_id", getProfile.data.data[0].id);
+    console.log("form_data", form_data);
+    try {
+      let response = await fetch(base_url + "/uploadImage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization:
+            "Bearer d9ec555fcbfe800fe5b6cd266ca71342a8588c474aba8c93f304958a5ffa979f",
+        },
+        body: form_data,
+      });
+      console.log("response is", JSON.stringify(response));
+      ////alert("Response: " + response.status)
+      if (response.status === 200) {
+        let data = await response.json();
+        return data;
+      } else {
+        let data = await response.json();
+        throw data;
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
   const no_photo_url =
     "http://panionprodupdated-env.eba-4pmuehik.eu-central-1.elasticbeanstalk.com";
   return (
