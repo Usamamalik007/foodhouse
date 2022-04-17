@@ -32,6 +32,7 @@ import { useGetProfile } from "../../hooks/User/Profile/useGetProfile";
 import { useUpdateBillingAddress } from "../../hooks/User/Address/useUpdateBillingAddress";
 import { useUpdateShippingAddress } from "../../hooks/User/Address/useUpdateShippingAddress";
 import ImagePicker from "react-native-image-crop-picker";
+import { sleep } from "react-query/types/core/utils";
 const profileList = [
   {
     id: 1,
@@ -79,17 +80,24 @@ export default function ProfileScreen() {
   const address: any = useGetAddress();
   let getProfile: any = useGetProfile(userData?.user?.id);
   let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
-
+  console.log("dataISNow", JSON.stringify(getProfile));
   useFocusEffect(
     React.useCallback(() => {
       getProfile.refetch();
       address.refetch();
-      setImagePath(base_url + getProfile?.data.data[0].image);
+      fetchData();
       // setTimeout(() => {
       //   setImagePath(base_url + getProfile?.data.data[0].image);
       // }, 100);
     }, [])
   );
+  function sleep(ms: number | undefined) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  async function fetchData() {
+    await sleep(1000);
+    setImagePath(base_url + getProfile?.data.data[0].image);
+  }
 
   const navigation = useNavigation<any>();
   const [openOrderModal, setOpenOrderModal] = useState<boolean>(false);
