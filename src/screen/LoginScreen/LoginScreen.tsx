@@ -43,33 +43,6 @@ function LoginScreen() {
 
   const onSubmit = handleSubmit(values => {
     console.log('Values being', values);
-    
-  //   dispatch(loginUser({
-  //     "statusCode": 200,
-  //     "message": "success",
-  //     "user": {
-  //         "id": 13,
-  //         "first_name": "sehrish",
-  //         "last_name": "munir",
-  //         "email": "sehrish@gmail.com",
-  //         "username": '',
-  //         "is_email_verified": true,
-  //         "phone_number": "45567853",
-  //         "is_blocked": false,
-  //         "dob": '',
-  //         "gender": '',
-  //         "created_at": "2021-11-17T10:13:25.329Z",
-  //         "updated_at": "2021-11-26T07:42:32.645Z",
-  //         "role": {
-  //             "id": 4,
-  //             "name": "customer"
-  //         }
-  //     },
-  //     "refreshToken": "1twevpbe6ia",
-  //     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOjE4NSwidXNlcklkIjoxMywicm9sZSI6ImN1c3RvbWVyIiwicmVmcmVzaFRva2VuIjoiMXR3ZXZwYmU2aWEiLCJpYXQiOjE2MzgwMzY3MDksImV4cCI6MTYzODQ2ODcwOX0.a3f6Zao9tyJQ9BNmCNj4XbVZ0GlDLfDpQFr38nDSvlc",
-  //     "expiry_time": "432000"
-  //   }));
-  //   reset();
     loginUserRequest.mutate({
       email: values.email,
       password: values.password
@@ -78,12 +51,13 @@ function LoginScreen() {
   
   const loginUserRequest = useLoginUser({
     async onSuccess(res) {
-      navigation.navigate('BottomTabNavigator');
-      console.log('response is', res);
+      console.log('success', res);
+      // navigation.navigate('BottomTabNavigator');
       dispatch(loginUser(res));
       reset();
     },
     onError(err) {
+      console.log('err', err);
       SnackbarError(err.message);
     },
   });

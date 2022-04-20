@@ -8,18 +8,19 @@ import {httpUser} from '../../utils/axiosConfig';
 async function useLoginUserRequest(loginRequest: ILoginRequest) {
   console.log(JSON.stringify(loginRequest))
   try {
-    const res = await httpUser.post<ILoginResponse>('userLogin', loginRequest);
+    const res = await httpUser.post<ILoginResponse>('customerLogin', loginRequest);
     console.log('here')
     console.log(JSON.stringify(res))
     if (res.data.statusCode == 200) {
       return res.data;
     } else {
-      console.log(JSON.stringify(res))
-      throw new Error('Something Went Wrong');
+      console.log("error", JSON.stringify(res))
+      throw new Error(res.data.message);
     }
   } catch (err: any) {
     console.log(JSON.stringify(err))
-    throw new Error(err.response.data.message);
+    console.log(JSON.stringify(err))
+    throw new Error(err);
   }
 }
 

@@ -23,7 +23,7 @@ export default function ItemScreen(props: any) {
   console.log('props are', props.route.params);
   const userState: any = useAppSelector(state => state?.user?.user);
   let userData: any;
-  if (userState?.user) {
+  if (userState?.customer) {
   } else {
     userData = JSON?.parse(userState);
   }

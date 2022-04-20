@@ -27,42 +27,34 @@ import { AppTextInput } from "../../component/AppTextInput";
 import { useUpdatePhoneNo } from "../../hooks/User/useUpdatePhoneNo";
 import { useAppSelector } from "../../store/hooks";
 import { SnackbarSuccess, SnackbarError } from "../../utils/SnackBar";
-import { useGetAddress } from "../../hooks/User/Address/useGetAddress";
 import { useGetProfile } from "../../hooks/User/Profile/useGetProfile";
-import { useUpdateBillingAddress } from "../../hooks/User/Address/useUpdateBillingAddress";
-import { useUpdateShippingAddress } from "../../hooks/User/Address/useUpdateShippingAddress";
 import ImagePicker from "react-native-image-crop-picker";
 import { sleep } from "react-query/types/core/utils";
 const profileList = [
   {
     id: 1,
-    name: "Address book",
-    image: require("../../assets/imgs/locationMarker.png"),
-  },
-  {
-    id: 2,
     name: "Payment Information",
     image: require("../../assets/imgs/paymentInformation.png"),
   },
   {
-    id: 3,
+    id: 2,
     name: "Orders",
     image: require("../../assets/imgs/order.png"),
     value: "0",
   },
   {
-    id: 4,
+    id: 3,
     name: "Favourites",
     image: require("../../assets/imgs/favourite.png"),
     value: "2",
   },
   {
-    id: 5,
+    id: 4,
     name: "Edit Profile",
     image: require("../../assets/imgs/user.png"),
   },
   {
-    id: 6,
+    id: 5,
     name: "Log Out",
     image: require("../../assets/imgs/logout.png"),
   },
@@ -77,14 +69,12 @@ export default function ProfileScreen() {
     userData = JSON?.parse(userState);
   }
   const dispatch = useDispatch();
-  const address: any = useGetAddress();
   let getProfile: any = useGetProfile(userData?.user?.id);
   let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
   console.log("dataISNow", JSON.stringify(getProfile));
   useFocusEffect(
     React.useCallback(() => {
       getProfile.refetch();
-      address.refetch();
       fetchData();
       // setTimeout(() => {
       //   setImagePath(base_url + getProfile?.data.data[0].image);
@@ -96,6 +86,7 @@ export default function ProfileScreen() {
   }
   async function fetchData() {
     await sleep(1000);
+    console.log(getProfile?.data.data[0])
     setImagePath(base_url + getProfile?.data.data[0].image);
   }
 
@@ -110,16 +101,14 @@ export default function ProfileScreen() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      phoneno: getProfile?.data?.customer?.user?.phone_number,
+      phoneno: getProfile?.data?.data[0].mobileno,
     },
   });
 
   const changeValue = (id: number) => {
     if (id == 1) {
-      setOpenOrderModal(!openOrderModal);
-    } else if (id == 2) {
       setOpenPaymentModal(!openPaymentModal);
-    } else if (id == 4) {
+    } else if (id == 2) {
       setOpenOrderModal(!openOrderModal);
       setOpenPaymentModal(!openPaymentModal);
       navigation.navigate("FavouritesScreen");
@@ -127,14 +116,14 @@ export default function ProfileScreen() {
       setOpenOrderModal(!openOrderModal);
       setOpenPaymentModal(!openPaymentModal);
       navigation.navigate("OrderScreen");
-    } else if (id == 5) {
+    } else if (id == 4) {
       setOpenOrderModal(!openOrderModal);
       setOpenPaymentModal(!openPaymentModal);
       navigation.navigate(
         "AppUserBasicProfile",
-        getProfile?.data?.customer?.user
+        getProfile?.data?.data[0]
       );
-    } else if (id == 6) {
+    } else if (id == 5) {
       dispatch(logOutUser());
     }
   };
@@ -165,35 +154,8 @@ export default function ProfileScreen() {
     },
   });
 
-  const onSubmitShippingAddress = (id: number) => {
-    updateShipAddress.mutate(id);
-  };
 
-  const updateShipAddress = useUpdateShippingAddress({
-    onSuccess(res) {
-      navigation.goBack();
-      SnackbarSuccess("Shipping Address Updated.");
-    },
-    onError(err) {
-      SnackbarError("Error in Updating");
-      setEdit(false);
-    },
-  });
 
-  const onSubmitBillingAddress = (id: number) => {
-    updateBillAddress.mutate(id);
-  };
-
-  const updateBillAddress = useUpdateBillingAddress({
-    onSuccess(res) {
-      navigation.goBack();
-      SnackbarSuccess("Shipping Address Updated.");
-    },
-    onError(err) {
-      SnackbarError("Error in Updating");
-      setEdit(false);
-    },
-  });
   const [imagePath, setImagePath] = useState<string>("");
 
   function openImagePicker() {
@@ -205,7 +167,9 @@ export default function ProfileScreen() {
       //@ts-ignore
       setImagePath(image.path);
       postImage();
-    });
+    }).catch((callBack)=>{ // you forgot to add catch to this promise.
+      console.log(callBack); // Please handle the callBack here.
+     });
   }
   console.log("image path is", imagePath);
   async function postImage() {
@@ -218,23 +182,21 @@ export default function ProfileScreen() {
     form_data.append("user_id", getProfile.data.data[0].id);
     console.log("form_data", form_data);
     try {
-      let response = await fetch(base_url + "/uploadImage", {
+      let response:any = await fetch(base_url + "/uploadImage", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization:
-            "Bearer d9ec555fcbfe800fe5b6cd266ca71342a8588c474aba8c93f304958a5ffa979f",
+            "Bearer e0788a59678573984bdd906c2e88d7aa1b263edf307183ec2568aa3da1d26e8c",
         },
         body: form_data,
       });
+      response = await response.json();
       console.log("response is", JSON.stringify(response));
-      ////alert("Response: " + response.status)
-      if (response.status === 200) {
-        let data = await response.json();
-        return data;
+      if (response.statusCode === 200) {
+        SnackbarSuccess(response.message);
       } else {
-        let data = await response.json();
-        throw data;
+        SnackbarError(response.message);
       }
     } catch (e) {
       throw e;
@@ -274,12 +236,12 @@ export default function ProfileScreen() {
         </TouchableOpacity>
         <View style={{ marginTop: 30, marginRight: 30, width: "35%" }}>
           <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
-            {getProfile?.data?.customer?.user?.first_name}
-            {""}
-            {getProfile?.data?.customer?.user?.last_name}
+            {getProfile?.data?.data[0]?.fname}
+            {" "}
+            {getProfile?.data?.data[0]?.lname}
           </Text>
           <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
-            {getProfile?.data?.customer?.user?.phone_number}
+           {getProfile?.data?.data[0]?.mobileno}
           </Text>
         </View>
       </View>
@@ -294,225 +256,6 @@ export default function ProfileScreen() {
           />
         );
       })}
-
-      {/* <View>
-        <Modal
-          isVisible={openOrderModal}
-          hasBackdrop={true}
-          deviceWidth={width}
-          backdropTransitionOutTiming={0}
-          animationInTiming={400}
-          style={{
-            justifyContent: 'flex-end',
-            bottom: 0,
-            margin: 0,
-            height: 450,
-          }}
-          onBackButtonPress={() => {
-            setOpenOrderModal(!openOrderModal);
-          }}
-          onBackdropPress={() => {
-            setOpenOrderModal(!openOrderModal);
-          }}>
-          <View style={innerStyles.container}>
-            <View style={[innerStyles.modalContainer, ,]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                }}>
-                <AppTextTitle title={'Address Book'} />
-              </View>
-              <ScrollView
-                style={{
-                  height: address?.data?.response?.length > 2 ? 250 : 210,
-                }}>
-                {address?.data?.response?.map((add: any, index: number) => {
-                  return (
-                    <View style={{}} key={index}>
-                      <View
-                        style={{
-                          padding: 14,
-                          borderTopWidth: index % 2 == 0 ? 1 : 0,
-                          borderBottomWidth: index % 2 == 0 ? 1 : 0,
-                          borderColor: '#000000',
-                        }}>
-                        <Text style={{color: '#070A0D'}}>
-                          Address # {index + 1}
-                        </Text>
-                        <Text style={{color: '#070A0D', marginVertical: 5}}>
-                          {add?.address_line1} {add?.address_line2} {add?.city}{' '}
-                          {add?.country?.name}
-                        </Text>
-                        <View style={{flexDirection: 'row', marginVertical: 5}}>
-                          <TouchableOpacity
-                            onPress={() =>
-                              navigation.navigate('AppUpdateAddress', add)
-                            }>
-                            <Text
-                              style={{
-                                fontWeight: '700',
-                                color: '#070A0D',
-                                fontSize: 12,
-                              }}>
-                              Update
-                            </Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity>
-                            <Text
-                              style={{
-                                fontWeight: '700',
-                                color: '#070A0D',
-                                fontSize: 12,
-                                marginLeft: 7,
-                              }}>
-                              Remove
-                            </Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => onSubmitBillingAddress(add.id)}>
-                            <Text
-                              style={{
-                                fontWeight: '700',
-                                color: '#070A0D',
-                                fontSize: 12,
-                                marginLeft: 7,
-                              }}>
-                              Set as billing Address
-                            </Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => onSubmitShippingAddress(add.id)}>
-                            <Text
-                              style={{
-                                fontWeight: '700',
-                                color: '#070A0D',
-                                fontSize: 12,
-                                marginLeft: 7,
-                              }}>
-                              Set as shipping Address
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-                  );
-                })}
-              </ScrollView>
-
-              <TouchableOpacity style={{width: '90%', alignSelf: 'center'}}>
-                <AppAddToCart
-                  title={'Add New Address'}
-                  navigationScreen="AppAddAddress"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-      </View> */}
-
-      {/* Payment Modal Open */}
-      {/* <View>
-        <Modal
-          isVisible={openPaymentModal}
-          hasBackdrop={true}
-          deviceWidth={width}
-          backdropTransitionOutTiming={0}
-          animationInTiming={600}
-          style={{justifyContent: 'flex-end', bottom: 0, margin: 0}}
-          onBackButtonPress={() => {
-            setOpenPaymentModal(!openPaymentModal);
-          }}
-          onBackdropPress={() => {
-            setOpenPaymentModal(!openPaymentModal);
-          }}>
-          <View style={innerStyles.container}>
-            <View style={innerStyles.modalContainer}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                }}>
-                <AppTextTitle title={'Payment Information'} />
-              </View>
-              <ScrollView>
-                <View
-                  style={{
-                    padding: 16,
-                    borderWidth: 1,
-                    borderColor: '#000000',
-                  }}>
-                  <View style={{flexDirection: 'row'}}>
-                    <View>
-                      <Text>mastercard</Text>
-                    </View>
-                    <Text>*** *** **** 3409</Text>
-                  </View>
-                  <View style={{flexDirection: 'row', marginVertical: 5}}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        console.log('Pressed update');
-                      }}>
-                      <Text
-                        style={{
-                          fontWeight: '700',
-                          color: '#070A0D',
-                          fontSize: 12,
-                        }}>
-                        Update
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity>
-                      <Text
-                        style={{
-                          fontWeight: '700',
-                          color: '#070A0D',
-                          fontSize: 12,
-                          marginLeft: 7,
-                        }}>
-                        Remove
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={{padding: 16}}>
-                  <View style={{flexDirection: 'row'}}>
-                    <View>
-                      <Text>mastercard</Text>
-                    </View>
-                    <Text>*** *** **** 3409</Text>
-                  </View>
-                  <View style={{flexDirection: 'row', marginVertical: 5}}>
-                    <TouchableOpacity>
-                      <Text
-                        style={{
-                          fontWeight: '700',
-                          color: '#070A0D',
-                          fontSize: 12,
-                        }}>
-                        Update
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity>
-                      <Text
-                        style={{
-                          fontWeight: '700',
-                          color: '#070A0D',
-                          fontSize: 12,
-                          marginLeft: 7,
-                        }}>
-                        Remove
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <AppAddToCart title={'Add New'} />
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      </View> */}
     </SafeAreaView>
   );
 }
@@ -522,7 +265,6 @@ const innerStyles = StyleSheet.create({
     flexDirection: "row",
     height: 110,
     backgroundColor: appColors.white,
-    // justifyContent: 'space-between',
   },
   image: {
     height: 70,

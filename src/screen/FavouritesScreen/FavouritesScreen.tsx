@@ -14,13 +14,12 @@ import {useAppSelector} from '../../store/hooks';
 export default function FavouritesScreen() {
   const userState: any = useAppSelector(state => state?.user?.user);
   let userData;
-  if (userState?.user) {
+  if (userState?.customer) {
   } else {
     userData = JSON?.parse(userState);
   }
 
   useEffect(() => {
-    alert('called')
     
 }, []);
   const allfavouriteList: any = useGetAllFavourites<WishListResponse>(

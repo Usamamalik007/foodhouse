@@ -50,7 +50,7 @@ function AppUpdateAddress(props: any) {
 
   const userState: any = useAppSelector(state => state?.user?.user);
   let userData: any;
-  if (userState?.user) {
+  if (userState?.customer) {
   } else {
     userData = JSON?.parse(userState);
   }
