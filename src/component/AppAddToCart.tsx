@@ -3,21 +3,26 @@ import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/core';
 import {useAddProductToCartRequest} from '../hooks/Cart/useProductToCart';
 import {SnackbarError, SnackbarSuccess} from '../utils/SnackBar';
+import { configureStore } from '@reduxjs/toolkit';
 
 interface IAddProductToCartRequest {
   productId: string;
   quantity: number;
+  restaurantId: string
 }
 
 function AppAddToCart(props: any) {
   const navigation = useNavigation<any>();
 
   const onSubmit = (values: IAddProductToCartRequest) => {
+    console.log(JSON.stringify(values))
     if (values.productId) {
       console.log('S', typeof values.productId.toString());
       addItemToCart.mutate({
-        productId: values.productId,
-        quantity: 1,
+        // cart_id: 
+        restaurant_id: values.restaurantId,
+        food_item_id: values.productId,
+        amount: values.quantity,
       });
     } else {
       if (props.navigationScreen) {
@@ -28,11 +33,21 @@ function AppAddToCart(props: any) {
 
   const addItemToCart = useAddProductToCartRequest({
     async onSuccess(res) {
-      console.log('response is', res);
-      SnackbarSuccess(res.message);
-      if (props.navigationScreen) {
-        navigation.navigate(props.navigationScreen);
+      if (res.statusCode == 200){
+        SnackbarSuccess(res.message);
+        if (props.navigationScreen) {
+          navigation.navigate(props.navigationScreen);
+        }
       }
+      else{
+        SnackbarError(res.message);
+        if (props.navigationScreen) {
+          navigation.navigate(props.navigationScreen);
+        }
+
+      }
+      console.log('response is', res);
+
     },
     onError(err) {
       SnackbarError(err.message);
@@ -42,7 +57,7 @@ function AppAddToCart(props: any) {
     <TouchableOpacity
       style={innerStyles.cartContainer}
       onPress={() => {
-        // onSubmit({productId: props.productID, quantity: 1});
+        onSubmit({productId: props.productID, quantity: props.quantity, restaurantId: props.restaurantId});
       }}>
       <Text style={innerStyles.addToCartText}>{props.title}</Text>
     </TouchableOpacity>

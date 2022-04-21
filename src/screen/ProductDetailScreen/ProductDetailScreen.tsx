@@ -1,7 +1,9 @@
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, { useState } from 'react';
+
+import {StyleSheet, Text, View, TextInput} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 
 import AppProductDetailSwiper from '../../component/AppProductDetailSwiper';
 import AppSize from '../../component/AppSize';
@@ -12,7 +14,12 @@ import AppAddToCart from '../../component/AppAddToCart';
 
 function ProductDetailScreen(props: any) {
   const product = props.route.params.productData;
+ 
+  const [quantity, setQuantity]= useState(0);
+
+
   console.log('rpduct', product);
+  console.log(quantity)
 
   return (
     <View style={[innerStyles.mainContainer]}>
@@ -27,6 +34,14 @@ function ProductDetailScreen(props: any) {
           <AppFavourite />
         </View>
         <Text style={innerStyles.currentPrice}> ${product.amount}</Text>
+        <Text style={innerStyles.productName}>Quantity</Text>
+        <TextInput 
+   style={{borderWidth: 1}}
+   keyboardType='numeric'
+   onChangeText={(text)=> {setQuantity(text)}}
+  //  value={quantity}
+   maxLength={10}  //setting limit of input
+/>
         {/* <AppColor tittleSize={20} colorSize={23} fontWeight={'700'} />
         <AppSize
           tittleSize={20}
@@ -58,7 +73,9 @@ function ProductDetailScreen(props: any) {
         <AppAddToCart
           title={'Add to cart'}
           productID={product.id.toString()}
+          restaurantId={product.restaurantId}
           navigationScreen={'CartScreen'}
+          quantity={quantity}
         />
       </ScrollView>
     </View>

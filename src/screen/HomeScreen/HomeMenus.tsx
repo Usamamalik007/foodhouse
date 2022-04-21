@@ -64,6 +64,7 @@ export default function HomeMenus(props: any) {
                         key={index}
                         id={individualProduct.id}
                         name={individualProduct.name}
+                        restaurantId={restaurantId}
                         amount={individualProduct.price}
                         is_wishlist={individualProduct.is_favourite}
                         image={individualProduct.image}
