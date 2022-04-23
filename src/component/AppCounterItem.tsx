@@ -23,6 +23,7 @@ export default function AppCounterItem({
   productImage,
   productID,
   quantity,
+  removeItem
 }: IAppCatalogue) {
   const navigation = useNavigation<any>();
   const [quantityCounter, setQuantityCounter] = useState(quantity);
@@ -51,33 +52,15 @@ export default function AppCounterItem({
 
         <View style={{flexDirection: 'column', marginRight: 150}}>
           <Text style={[innerStyles.text, {marginTop: 10}]}>{productName}</Text>
+          <Text style={[innerStyles.text, {marginTop: 10}]}>Quantity: {quantity}</Text>
           <Text style={[innerStyles.text, {marginTop: 10}]}>
-            ${productPrice}
+           Price per item: ${productPrice}
           </Text>
         </View>
 
-        <View style={{flexDirection: 'column', marginRight: 20, marginTop: 10}}>
-          <TouchableOpacity
-            onPress={async () => {
-              await setQuantityCounter(pre => {
-                return pre + 1;
-              });
-            }}>
-            <Ionicons name={'add-circle-outline'} size={20} />
-          </TouchableOpacity>
-          <View style={{marginTop: 3, marginBottom: 3, marginLeft: 5}}>
-            <Text>{quantityCounter}</Text>
-          </View>
-
-          <TouchableOpacity
-            onPress={async () => {
-              setQuantityCounter(prev => {
-                return prev - 1 < 1 ? prev : prev - 1;
-              });
-            }}>
-            <Ionicons name={'remove-circle-outline'} size={20} />
-          </TouchableOpacity>
-        </View>
+<TouchableOpacity onPress={()=>{
+  removeItem(cartItemID, productID)
+}} style={{marginTop: 30}}><Text>Remove</Text></TouchableOpacity>
       </View>
     </View>
   );

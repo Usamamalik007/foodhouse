@@ -30,7 +30,7 @@ interface ICommonProductToCartResponse {
 async function useAddProductToCart(value: IAddProductToCartRequest) {
   try {
     const res = await httpCustomer.post<ICommonProductToCartResponse>(
-      'cart/add',
+      'addToCart',
       value,
     );
     console.log(`res`, res);
@@ -83,9 +83,11 @@ async function useUpdateProductFromCart(value: IUpdateProductToCartRequest) {
 // Get Cart
 async function useGetUserCart<T>() {
   try {
-    const res = await httpCustomer.get<ICartDataResponse>(`cart`);
+    const res = await httpCustomer.get<ICartDataResponse>(`getCart`);
+    console.log(JSON.stringify(res))
     return res.data;
   } catch (err: any) {
+    console.log(JSON.stringify(err))
     throw new Error(err.response.data.message);
   }
 }
