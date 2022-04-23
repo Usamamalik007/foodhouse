@@ -15,7 +15,8 @@ export default function OrderScreen() {
     userData = JSON?.parse(userState);
   }
 
-  const orderList: any = useGetAllOrder(userData?.user?.id);
+  // const orderList: any = useGetAllOrder(userData?.user?.id);
+  const orderList: any = [];
   console.log(`orderList useGetAllOrder`, orderList?.data?.orders);
   return (
     <SafeAreaView>

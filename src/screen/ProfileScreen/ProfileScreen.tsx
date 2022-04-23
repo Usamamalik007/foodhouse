@@ -86,8 +86,8 @@ export default function ProfileScreen() {
   }
   async function fetchData() {
     await sleep(1000);
-    console.log(getProfile?.data.data[0])
-    setImagePath(base_url + getProfile?.data.data[0].image);
+    console.log(getProfile?.data?.data[0])
+    setImagePath(base_url + getProfile?.data?.data[0]?.image);
   }
 
   const navigation = useNavigation<any>();
@@ -107,17 +107,17 @@ export default function ProfileScreen() {
 
   const changeValue = (id: number) => {
     if (id == 1) {
-      setOpenPaymentModal(!openPaymentModal);
+      // setOpenPaymentModal(!openPaymentModal);
     } else if (id == 2) {
-      setOpenOrderModal(!openOrderModal);
-      setOpenPaymentModal(!openPaymentModal);
-      navigation.navigate("FavouritesScreen");
-    } else if (id == 3) {
-      setOpenOrderModal(!openOrderModal);
+      // setOpenOrderModal(!openOrderModal);
       setOpenPaymentModal(!openPaymentModal);
       navigation.navigate("OrderScreen");
+    } else if (id == 3) {
+      // setOpenOrderModal(!openOrderModal);
+      setOpenPaymentModal(!openPaymentModal);
+      navigation.navigate("FavouritesScreen");
     } else if (id == 4) {
-      setOpenOrderModal(!openOrderModal);
+      // setOpenOrderModal(!openOrderModal);
       setOpenPaymentModal(!openPaymentModal);
       navigation.navigate(
         "AppUserBasicProfile",
