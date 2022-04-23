@@ -39,7 +39,8 @@ export interface IRegisterUserRequest {
   lname: string;
   email: string;
   password: string;
-  gender: number
+  gender: number,
+  role: number
 }
 
 export interface IRegisterUserResponse {

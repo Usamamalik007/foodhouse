@@ -10,7 +10,7 @@ async function useRegisterUserRequest(registerRequest: IRegisterUserRequest) {
   console.log(JSON.stringify(registerRequest))
   try {
     const res = await httpCustomer.post<IRegisterUserResponse>(
-      'userSignup',
+      'customerSignup',
       registerRequest,
     );
     console.log('response is',  JSON.stringify(res))
@@ -18,11 +18,11 @@ async function useRegisterUserRequest(registerRequest: IRegisterUserRequest) {
       return res.data;
     } else {
       console.log('error')
-      throw new Error('Something Went Wrong');
+      throw new Error(res.data.message);
     }
   } catch (err: any) {
     console.log('error sign up', JSON.stringify(err))
-    throw new Error(err.response.data.message);
+    throw new Error(err);
   }
 }
 

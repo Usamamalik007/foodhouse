@@ -69,7 +69,8 @@ function RegistrationScreen() {
       lname: values.last_name,
       email: values.email.toLowerCase(),
       password: values.password.trim(),
-      gender: updatedGender
+      gender: updatedGender,
+      role: 2
     });
   });
 
