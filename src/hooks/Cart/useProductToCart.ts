@@ -8,18 +8,15 @@ import {ICartDataResponse} from '../../interfaces/ICartData';
 import {httpCustomer} from '../../utils/axiosConfig';
 
 interface IAddProductToCartRequest {
-  productId: string;
-  quantity: number;
+  restaurant_id: string,
+  food_item_id: string;
+  amount: number;
 }
 
 interface IRemoveProductToCartRequest {
   productId: string;
 }
 
-interface IUpdateProductToCartRequest {
-  cartItemId: string;
-  quantity: number;
-}
 
 interface ICommonProductToCartResponse {
   statusCode: number;
@@ -66,20 +63,6 @@ export function useRemoveProductFromCartRequest(
   return useMutation(useRemoveProductFromCart, options);
 }
 
-//Update
-async function useUpdateProductFromCart(value: IUpdateProductToCartRequest) {
-  try {
-    const res = await httpCustomer.put<ICommonProductToCartResponse>(
-      'cart/update',
-      value,
-    );
-    console.log(`res`, res);
-    return res.data;
-  } catch (err: any) {
-    console.log(`err`, err);
-    throw new Error(err.response.data.message);
-  }
-}
 // Get Cart
 async function useGetUserCart<T>() {
   try {
@@ -101,17 +84,6 @@ export function useAddProductToCartRequest(
   >,
 ) {
   return useMutation(useAddProductToCart, options);
-}
-
-export function useUpdateProductFromCartRequest(
-  options: UseMutationOptions<
-    ICommonProductToCartResponse,
-    Error,
-    IUpdateProductToCartRequest,
-    unknown
-  >,
-) {
-  return useMutation(useUpdateProductFromCart, options);
 }
 
 export function useGetCartRequest<T>(

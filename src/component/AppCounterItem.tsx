@@ -5,7 +5,6 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
 import {previousThursday} from 'date-fns';
-import {useUpdateProductFromCartRequest} from '../hooks/Cart/useProductToCart';
 
 interface IAppCatalogue {
   cartItemID: number;
@@ -27,20 +26,6 @@ export default function AppCounterItem({
 }: IAppCatalogue) {
   const navigation = useNavigation<any>();
   const [quantityCounter, setQuantityCounter] = useState(quantity);
-
-  const updateCounter = useUpdateProductFromCartRequest({
-    async onSuccess(res) {
-      console.log('response is', res);
-    },
-    onError(err) {},
-  });
-
-  useEffect(() => {
-    updateCounter.mutate({
-      cartItemId: cartItemID.toString(),
-      quantity: quantityCounter,
-    });
-  }, [quantityCounter]);
   return (
     <View>
       <View style={innerStyles.catalogueCard}>

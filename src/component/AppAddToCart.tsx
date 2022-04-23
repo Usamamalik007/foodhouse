@@ -33,6 +33,7 @@ function AppAddToCart(props: any) {
 
   const addItemToCart = useAddProductToCartRequest({
     async onSuccess(res) {
+      console.log("res in additemtocart", JSON.stringify(res) )
       if (res.statusCode == 200){
         SnackbarSuccess(res.message);
         if (props.navigationScreen) {

@@ -67,7 +67,7 @@ export default function CartScreen() {
   
    }
 
-   async function removeItem(cart_id, food_item_id) {
+   async function removeItem(cart_id: number, food_item_id: number) {
      
  
     let form_data = {
