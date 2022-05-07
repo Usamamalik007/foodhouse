@@ -76,15 +76,15 @@ function RestaurantRegistrationScreen() {
   const registerUserRequest = useRestaurantRegisterUser({
     async onSuccess(res) {
       console.log(JSON.stringify(res))
-    //   if (res.statusCode == 200){
-    //   console.log("res.statusCode", res.statusCode)
-    //   reset();
-    //     SnackbarSuccess(res.message);
-    //     navigation.navigate('LoginScreen');
-    //   }
-    //   else{
-    //     console.log(res.message);
-    //   }
+      if (res.statusCode == 200){
+      console.log("res.statusCode", res.statusCode)
+      reset();
+        SnackbarSuccess(res.message);
+        navigation.navigate('LoginScreen');
+      }
+      else{
+        console.log(res.message);
+      }
       
     },
     onError(err) {
