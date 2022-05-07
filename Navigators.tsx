@@ -5,6 +5,7 @@ import {Image} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import LoginScreen from './src/screen/LoginScreen/LoginScreen';
+import RestaurantRegistrationScreen from './src/screen/RestaurantRegistrationScreen/RestaurantRegistrationScreen'
 import HomeScreen from './src/screen/HomeScreen/HomeScreen';
 import CatalogueScreen from './src/screen/CatalogueScreen/CatalogueScreen';
 import FavouritesScreen from './src/screen/FavouritesScreen/FavouritesScreen';
@@ -96,6 +97,13 @@ export function AuthFlow() {
         }}
         name="RegistrationScreen"
         component={RegistrationScreen}
+      />
+      <MainStack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name="RestaurantRegistrationScreen"
+        component={RestaurantRegistrationScreen}
       />
       <MainStack.Screen
         options={{

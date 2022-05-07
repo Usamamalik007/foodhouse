@@ -22,7 +22,7 @@ const instanceAdmin = axios.create({
   baseURL: SERVER_URL_ADMIN,
 });
 
-const excludedUrls = ['customerLogin', 'customerSignup'];
+const excludedUrls = ['customerLogin', 'customerSignup', 'restaurantSignup'];
 
 instanceUser.interceptors.request.use(async function (config) {
   config.timeoutErrorMessage = 'Request Timed Out';

@@ -140,6 +140,18 @@ function LoginScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
+            navigation.navigate('RestaurantRegistrationScreen');
+          }}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 10,
+          }}>
+          <Text style={innerStyles.plainText}>Want to Register your restaurant?</Text>
+          <Text style={innerStyles.boldText}>Register Restaurant</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
             navigation.navigate('ForgetScreen');
           }}>
           <Text style={innerStyles.forgetPassword}>Forget Password</Text>

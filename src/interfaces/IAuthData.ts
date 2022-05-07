@@ -44,11 +44,31 @@ export interface IRegisterUserRequest {
   mobileno: number
 }
 
+
+//------ Register Restaurant Interface----//
+export interface IRegisterRestaurantRequest {
+  name: string;
+  owner: string;
+  email: string;
+  address: string;
+  password: string;
+  mobileno: number
+}
+
+
+
 export interface IRegisterUserResponse {
   statusCode: number;
   message: string;
   insert_id: number;
 }
+
+
+export interface IRegisterRestaurantResponse {
+  statusCode: number;
+  message: string;
+}
+
 
 //------ Forgot Password Interface----//
 export interface IForgotPasswordRequest {
