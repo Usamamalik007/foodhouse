@@ -58,9 +58,9 @@ function LoginScreen() {
     },
     onError(err) {
       console.log('err', err);
-      SnackbarError(err.message);
+      
     },
-  });
+  })
 
   return (
     <View style={innerStyles.main_container}>

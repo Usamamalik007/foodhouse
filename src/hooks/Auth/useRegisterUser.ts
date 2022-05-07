@@ -3,6 +3,7 @@ import {
   IRegisterUserRequest,
   IRegisterUserResponse,
 } from '../../interfaces/IAuthData';
+import {SnackbarError} from '../../utils/SnackBar';
 
 import {httpCustomer} from '../../utils/axiosConfig';
 
@@ -18,11 +19,11 @@ async function useRegisterUserRequest(registerRequest: IRegisterUserRequest) {
       return res.data;
     } else {
       console.log('error')
-      throw new Error(res.data.message);
+      SnackbarError(res.data.message);
     }
   } catch (err: any) {
     console.log('error sign up', JSON.stringify(err))
-    throw new Error(err);
+    SnackbarError(err);
   }
 }
 

@@ -40,7 +40,8 @@ export interface IRegisterUserRequest {
   email: string;
   password: string;
   gender: number,
-  role: number
+  role: number,
+  mobileno: number
 }
 
 export interface IRegisterUserResponse {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {StyleSheet, Text, View, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
@@ -9,7 +9,7 @@ import {AppTextInput} from '../../component/AppTextInput';
 import {AppButton} from '../../component/AppButton';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useRegisterUser} from '../../hooks/Auth/useRegisterUser';
-import {SnackbarSuccess} from '../../utils/SnackBar';
+import {SnackbarSuccess, SnackbarError} from '../../utils/SnackBar';
 import { RadioButton } from 'react-native-paper';
 
 
@@ -26,6 +26,10 @@ const schema = yup.object().shape({
     .matches(/^(\S+$)/, '*No spaces allowed')
     .min(3, '*Username must be at least 3 characters')
     .trim(),
+  mobile_no: yup
+  .number()
+  .required('*Please enter your mobile number')
+  .min(7, '*Please enter a valid number'),
   email: yup
     .string()
     .required('*Please enter your email')
@@ -55,18 +59,17 @@ function RegistrationScreen() {
 
   const [gender, setGender] = React.useState('male');
 
-  console.log(gender)
-
   const onSubmit = handleSubmit(values => {
     let updatedGender = 0
     if (gender == 'female') {
       updatedGender = 1
     }
-    SnackbarSuccess('Successfully Registered');
-    navigation.navigate('LoginScreen');
+    // SnackbarSuccess('Successfully Registered');
+    // navigation.navigate('LoginScreen');
     registerUserRequest.mutate({
       fname: values.first_name,
       lname: values.last_name,
+      mobileno: values.mobile_no,
       email: values.email.toLowerCase(),
       password: values.password.trim(),
       gender: updatedGender,
@@ -76,14 +79,21 @@ function RegistrationScreen() {
 
   const registerUserRequest = useRegisterUser({
     async onSuccess(res) {
+      console.log(res)
+      if (res.statusCode == 200){
+      console.log("res.statusCode", res.statusCode)
       reset();
-      console.log('Response is', res);
-      SnackbarSuccess('Successfully Registered');
-      navigation.navigate('LoginScreen');
+        SnackbarSuccess(res.message);
+        navigation.navigate('LoginScreen');
+      }
+      else{
+        console.log(res.message);
+      }
+      
     },
     onError(err) {
-      navigation.navigate('LoginScreen');
-      console.log('Error', err);
+      console.log(err.message);
+      // navigation.navigate('LoginScreen');
     },
   });
 
@@ -132,26 +142,19 @@ function RegistrationScreen() {
             </Text>
           )}
 
-          <Text style={{fontSize: 24}}>Gender</Text>
-          <View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <RadioButton
-              value="0"
-              status={gender === 'male' ? 'checked' : 'unchecked'}
-              onPress={() => setGender('male')}
-            />
-            <Text>Male</Text>
-            </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            
-            <RadioButton
-              value="1"
-              status={gender === 'female' ? 'checked' : 'unchecked'}
-              onPress={() => setGender('female')}
-            />
-            <Text>Female</Text>
-            </View>
-          </View>
+          <AppTextInput
+            name="mobile_no"
+            control={control}
+            textInputProps={{
+              placeholder: 'Mobile Number',
+              style: {fontSize: 12,},
+            }}
+          />
+          {errors.mobile_no && (
+            <Text style={innerStyles.errorField}>
+              {errors.mobile_no['message']}
+            </Text>
+          )}
           <AppTextInput
             name="email"
             control={control}
@@ -174,11 +177,27 @@ function RegistrationScreen() {
               style: {fontSize: 12,},
             }}
           />
+          
+          <View style={{flexDirection: 'row', flexWrap: "nowrap", alignItems: 'center'}}>
+            <RadioButton
+              value="0"
+              status={gender === 'male' ? 'checked' : 'unchecked'}
+              onPress={() => setGender('male')}
+            />
+            <Text>Male</Text>
+            <RadioButton
+              value="1"
+              status={gender === 'female' ? 'checked' : 'unchecked'}
+              onPress={() => setGender('female')}
+            />
+            <Text>Female</Text>
+            </View>
           {errors.password && (
             <Text style={innerStyles.errorField}>
               {errors.password['message']}
             </Text>
           )}
+          
           <AppButton
             text="Create my account"
             buttonProps={{

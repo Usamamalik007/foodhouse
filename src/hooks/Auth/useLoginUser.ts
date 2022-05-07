@@ -3,6 +3,7 @@ import {
   ILoginRequest,
   IUserSessionData as ILoginResponse,
 } from '../../interfaces/IAuthData';
+import {SnackbarError} from '../../utils/SnackBar';
 import {httpUser} from '../../utils/axiosConfig';
 
 async function useLoginUserRequest(loginRequest: ILoginRequest) {
@@ -15,12 +16,11 @@ async function useLoginUserRequest(loginRequest: ILoginRequest) {
       return res.data;
     } else {
       console.log("error", JSON.stringify(res))
-      throw new Error(res.data.message);
+      SnackbarError(res.data.message);
     }
   } catch (err: any) {
     console.log(JSON.stringify(err))
-    console.log(JSON.stringify(err))
-    throw new Error(err);
+    SnackbarError(err);
   }
 }
 
