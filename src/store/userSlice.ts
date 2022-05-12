@@ -1,7 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {IUserSessionData} from '../interfaces/IAuthData';
-export const userKey = 'userKey';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { IUserSessionData } from "../interfaces/IAuthData";
+export const userKey = "userKey";
 
 export interface IUserState {
   user: IUserSessionData | null; // -----Temp Added remove | null later on-----------------
@@ -25,37 +25,38 @@ const initialState: IUserState = {
 // WARNING https://github.com/reduxjs/redux-toolkit/issues/429#issuecomment-810014208
 // always add unique names to your createAsyncThunk calls !
 
-const loadUserFromStorage = createAsyncThunk('user/loadFromStorage', () => {
+const loadUserFromStorage = createAsyncThunk("user/loadFromStorage", () => {
   return AsyncStorage.getItem(userKey);
 });
 
-const logOutUser = createAsyncThunk('userapi/user/logout', () => {
-  console.log('User Logged Out');
+const logOutUser = createAsyncThunk("userapi/user/logout", () => {
+  console.log("User Logged Out");
   return AsyncStorage.removeItem(userKey);
 });
 
 const loginUser = createAsyncThunk(
-  'user/loginUser',
+  "user/loginUser",
   async (userData: IUserSessionData) => {
-    console.log('======userData==============================');
+    console.log("======userData==============================");
     console.log(userData);
-    console.log('=======userData=============================');
+    console.log("=======userData=============================");
     await AsyncStorage.setItem(userKey, JSON.stringify(userData));
+    await AsyncStorage.setItem("user_data", JSON.stringify(userData));
     return userData;
-  },
+  }
 );
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {},
   // use the builder pattern its easier to understand
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
       .addCase(
         loadUserFromStorage.fulfilled,
         (state, action: PayloadAction<any>) => {
-          const {payload} = action;
+          const { payload } = action;
           const user = payload;
           if (user) {
             state.isLoadingStorageData = false;
@@ -66,20 +67,20 @@ const userSlice = createSlice({
             state.isLoggedIn = false;
             state.user = null;
           }
-        },
+        }
       )
       .addCase(
         loginUser.fulfilled,
         (state, action: PayloadAction<IUserSessionData>) => {
-          const {payload} = action;
+          const { payload } = action;
           state.isLoggedIn = true;
           state.user = payload;
-        },
+        }
       )
-      .addCase(loadUserFromStorage.rejected, state => {
+      .addCase(loadUserFromStorage.rejected, (state) => {
         state.isLoadingStorageData = false;
       })
-      .addCase(logOutUser.fulfilled, state => {
+      .addCase(logOutUser.fulfilled, (state) => {
         state.isLoggedIn = false;
         state.user = null;
       });
@@ -87,4 +88,4 @@ const userSlice = createSlice({
 });
 
 const userReducer = userSlice.reducer;
-export {userReducer, loadUserFromStorage, logOutUser, loginUser};
+export { userReducer, loadUserFromStorage, logOutUser, loginUser };
