@@ -20,6 +20,15 @@ export default function HomeScreen() {
   let userData: any;
   console.log("userData", userData)
   console.log("userState", userState)
+
+  let isRestaurantMenuScreen = false;
+
+  if (userState?.customer?.role == 1){
+    isRestaurantMenuScreen = true
+    
+  }
+
+  console.log('user___data_in_categories', JSON.stringify(userState))
   if (userState?.customer) {
   } else {
     userData = JSON?.parse(userState);
@@ -32,6 +41,20 @@ export default function HomeScreen() {
   console.log('===========heroesList=========================');
   console.log(JSON.stringify(heroesList));
   console.log('===========heroesList=========================');
+  if (isRestaurantMenuScreen){
+    return (
+      <SafeAreaView style={styles.root}>
+        <ScrollView>
+          {/* <AppCaraosaul /> */}
+          <View style={{paddingRight: 16, paddingLeft: 16, paddingBottom: 16}}>
+         <Text>
+           Restaurant Menu Screen for Adeed
+         </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView>
