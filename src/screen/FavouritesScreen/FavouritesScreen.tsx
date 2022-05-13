@@ -19,6 +19,14 @@ export default function FavouritesScreen() {
     userData = JSON?.parse(userState);
   }
 
+
+  let isScreenNotAvailable = false;
+
+  if (userState?.customer?.role == 1){
+    isScreenNotAvailable = true
+    
+  }
+
   useEffect(() => {
     
 }, []);
@@ -148,6 +156,16 @@ export default function FavouritesScreen() {
   console.log('==============allfavouriteList======================');
   console.log(JSON.stringify(allfavouriteList));
   console.log('==============allfavouriteList======================');
+  if (isScreenNotAvailable){
+    return(
+      <SafeAreaView style={{flex: 1, paddingLeft: 15, paddingRight: 15}}>
+      <ScrollView>
+        <Text>This Screen is not available for this user</Text>
+      </ScrollView>
+    </SafeAreaView>
+      
+    )
+  }
   return (
     <SafeAreaView style={{flex: 1, paddingLeft: 15, paddingRight: 15}}>
       <ScrollView>

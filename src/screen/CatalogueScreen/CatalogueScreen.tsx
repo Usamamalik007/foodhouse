@@ -4,7 +4,36 @@ import styles from '../../assets/css/style';
 import AppCatalogueCategory from '../../component/AppCatalogueCategory';
 import AppTextTitle from '../../component/AppTextTitle';
 
+import {useAppSelector} from '../../store/hooks';
+
+
+
 export default function CatalogueScreen() {
+  const userState: any = useAppSelector(state => state?.user?.user);
+  let userData;
+  if (userState?.customer) {
+  } else {
+    userData = JSON?.parse(userState);
+  }
+
+
+  let isScreenNotAvailable = false;
+
+  if (userState?.customer?.role == 1){
+    isScreenNotAvailable = true
+    
+  }
+  if (isScreenNotAvailable){
+    return(
+      <SafeAreaView style={{flex: 1, paddingLeft: 15, paddingRight: 15}}>
+      <ScrollView showsHorizontalScrollIndicator={false}>
+        <AppTextTitle title="Screen not available for this user" />
+     
+      </ScrollView>
+    </SafeAreaView>
+
+    )
+  }
   return (
     <SafeAreaView style={{flex: 1, paddingLeft: 15, paddingRight: 15}}>
       <ScrollView showsHorizontalScrollIndicator={false}>

@@ -14,13 +14,26 @@ import AppCounterItem from '../../component/AppCounterItem';
 import AppTextTitle from '../../component/AppTextTitle';
 import {useGetCartRequest} from '../../hooks/Cart/useProductToCart';
 import {ICartDataResponse} from '../../interfaces/ICartData';
+import {useAppSelector} from '../../store/hooks';
+
 
 export default function CartScreen() {
   // let cartItemList = useGetCartRequest<ICartDataResponse>().data;
+  
   const navigation = useNavigation<any>();
   
   const [cartItemList, setCartItemList] = useState([]);
 
+  const userState: any = useAppSelector(state => state?.user?.user);
+
+  let isRestaurantOrderScreen = false;
+
+  if (userState?.customer?.role == 1){
+    isRestaurantOrderScreen = true
+    
+  }
+
+  
   useEffect(() => {
     // Update the document title using the browser API
     getCartItemList()
@@ -129,6 +142,40 @@ export default function CartScreen() {
       }
     
   
+   }
+   if (isRestaurantOrderScreen){
+    return (
+      <SafeAreaView
+        style={{
+          paddingLeft: 15,
+          paddingRight: 15,
+          flex: 1,
+          position: 'relative',
+        }}>
+        <ScrollView>
+          <AppTextTitle title="Order Screen for Adeed" />
+  
+       
+        </ScrollView>
+        {/* <View
+          style={{
+            bottom: 0,
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            padding: 10,
+          }}>
+          <TouchableOpacity
+            style={innerStyles.cartContainer}
+            onPress={() => {
+              navigation.navigate('CheckoutScreen', cartItemList?.response);
+            }}>
+            <Text style={innerStyles.addToCartText}>Check Out</Text>
+          </TouchableOpacity>
+        </View> */}
+      </SafeAreaView>
+    );
+
    }
   return (
     <SafeAreaView
