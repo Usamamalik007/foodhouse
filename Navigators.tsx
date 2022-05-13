@@ -61,7 +61,7 @@ const LogoTitle340 = () => {
 };
 export function MainFlow() {
   const isRole = tempData.toString().includes("role");
-  console.log("dataisNowOuui", tempData.toString());
+  console.log("dataisNowOuui", JSON.stringify(tempData));
   return (
     <MainStack.Navigator
       initialRouteName="AppAddAddress"

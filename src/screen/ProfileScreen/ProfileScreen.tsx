@@ -64,7 +64,7 @@ const { width } = Dimensions.get("screen");
 export default function ProfileScreen() {
   const userState: any = useAppSelector((state) => state?.user?.user);
   let userData: any;
-  if (userState?.user) {
+  if (userState?.customer) {
   } else {
     userData = JSON?.parse(userState);
   }
@@ -179,7 +179,7 @@ export default function ProfileScreen() {
       name: "image.jpg",
       type: "image/jpg",
     });
-    form_data.append("user_id", getProfile.data.data[0].id);
+    form_data.append("user_id", getProfile?.data?.data[0].id);
     console.log("form_data", form_data);
     try {
       let response:any = await fetch(base_url + "/uploadImage", {
