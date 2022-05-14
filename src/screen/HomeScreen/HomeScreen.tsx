@@ -6,6 +6,11 @@ import {
   SafeAreaView,
   ScrollView,
   AsyncStorage,
+  Image,
+  TouchableOpacity,
+  TouchableOpacityBase,
+  Modal,
+  TextInput,
 } from "react-native";
 
 import styles from "../../assets/css/style";
@@ -20,7 +25,20 @@ import { ILocalHeroDataResponse } from "../../interfaces/ILocalHerosData";
 
 import { Product } from "../../interfaces/IProductData";
 import { useAppSelector } from "../../store/hooks";
-
+const items = [
+  {
+    id: "id1",
+    name: "name1",
+    image: "image1",
+    price: "price1",
+  },
+  {
+    id: "id2",
+    name: "name2",
+    image: "image2",
+    price: "price2",
+  },
+];
 export default function HomeScreen() {
   const userState: any = useAppSelector((state) => state?.user?.user);
   let userData: any;
@@ -34,12 +52,17 @@ export default function HomeScreen() {
   }
 
   console.log("user___data_in_categories", JSON.stringify(userState));
+
   if (userState?.customer) {
   } else {
     userData = JSON?.parse(userState);
   }
   console.log("userData", userData);
-
+  const [foodItemList, setFoodItemList] = useState(items);
+  const [addItemName, setAddItemName] = useState<string>("hello");
+  const [addItemPrice, setAddItemPrice] = useState();
+  const [addItemImage, setAddItemImage] = useState();
+  const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
     userData?.customer?.id
   );
@@ -82,17 +105,204 @@ export default function HomeScreen() {
   console.log("===========heroesList=========================");
   console.log(JSON.stringify(heroesList));
   console.log("===========heroesList=========================");
+  function renderModal() {
+    return (
+      showAddItemModal && (
+        <Modal
+          style={{
+            backgroundColor: "red",
+            position: "absolute",
+            bottom: 0,
+          }}
+          visible={showAddItemModal}
+          onRequestClose={() => {
+            setShowAddItemModal(false);
+          }}
+        >
+          <View
+            style={{
+              justifyContent: "center",
+              marginTop: 30,
+              padding: 20,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "500",
+                color: "black",
+              }}
+            >
+              Enter the following data to add item
+            </Text>
+            <View
+              style={{
+                marginTop: 30,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "500",
+                  color: "black",
+                }}
+              >
+                Item name
+              </Text>
+              <TextInput
+                onChange={(e) => setAddItemName(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: 40,
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  marginTop: 12,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "500",
+                  color: "black",
+                  marginTop: 30,
+                }}
+              >
+                Item Price
+              </Text>
+              <TextInput
+                onChange={(value) => {
+                  console.log("item", addItemName);
+                }}
+                style={{
+                  width: "100%",
+                  height: 40,
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  marginTop: 12,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "500",
+                  color: "black",
+                  marginTop: 30,
+                }}
+              >
+                Image
+              </Text>
+              <TextInput
+                onChange={(value) => {}}
+                style={{
+                  width: "100%",
+                  height: 40,
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  marginTop: 12,
+                }}
+              />
+            </View>
+          </View>
+        </Modal>
+      )
+    );
+  }
 
-  if (isRestaurantMenuScreen) {
+  if (!isRestaurantMenuScreen) {
     return (
       <SafeAreaView style={styles.root}>
-        <ScrollView>
-          {/* <AppCaraosaul /> */}
+        {renderModal()}
+        <ScrollView
+          contentContainerStyle={{
+            padding: 20,
+          }}
+        >
           <View
-            style={{ paddingRight: 16, paddingLeft: 16, paddingBottom: 16 }}
+            style={{
+              justifyContent: "space-between",
+              flexDirection: "row",
+            }}
           >
-            <Text>Restaurant Menu Screen for Adeed</Text>
+            <Text
+              style={{
+                color: "black",
+                fontSize: 20,
+                fontWeight: "bold",
+              }}
+            >
+              Item List
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                setShowAddItemModal(true);
+              }}
+            >
+              <Image
+                style={{
+                  width: 24,
+                  height: 24,
+                }}
+                source={require("../../assets/imgs/new_plus_icon.png")}
+              />
+            </TouchableOpacity>
           </View>
+
+          {foodItemList.map((item) => {
+            return (
+              <View
+                style={{
+                  marginTop: 30,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={require("../../assets/imgs/user.png")}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: "black",
+                    fontSize: 18,
+                    fontWeight: "500",
+                  }}
+                >
+                  {item.name}
+                </Text>
+                <Text
+                  style={{
+                    color: "black",
+                    fontSize: 18,
+                    fontWeight: "500",
+                  }}
+                >
+                  {item.price}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    let tempList = foodItemList.filter((foodItem) => {
+                      return foodItem.id !== item.id;
+                    });
+                    setFoodItemList(tempList);
+                    console.log("list", tempList);
+                  }}
+                >
+                  <Image
+                    style={{
+                      width: 24,
+                      height: 24,
+                    }}
+                    source={require("../../assets/imgs/new-blackish-cross.png")}
+                  />
+                </TouchableOpacity>
+              </View>
+            );
+          })}
         </ScrollView>
       </SafeAreaView>
     );
