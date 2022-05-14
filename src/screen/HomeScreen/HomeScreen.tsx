@@ -12,6 +12,7 @@ import {
   Modal,
   TextInput,
 } from "react-native";
+import { string } from "yup";
 
 import styles from "../../assets/css/style";
 import AppCaraosaul from "../../component/AppCaraosaul";
@@ -25,6 +26,16 @@ import { ILocalHeroDataResponse } from "../../interfaces/ILocalHerosData";
 
 import { Product } from "../../interfaces/IProductData";
 import { useAppSelector } from "../../store/hooks";
+type addedItemType = {
+  name: string;
+  image: string;
+  price: string;
+};
+const addedItem = {
+  name: "name1",
+  image: "image1",
+  price: "price1",
+};
 const items = [
   {
     id: "id1",
@@ -42,8 +53,8 @@ const items = [
 export default function HomeScreen() {
   const userState: any = useAppSelector((state) => state?.user?.user);
   let userData: any;
-  console.log("userData", userData);
-  console.log("userState", userState);
+  //console.log("userData", userData);
+  //console.log("userState", userState);
 
   let isRestaurantMenuScreen = false;
 
@@ -51,24 +62,23 @@ export default function HomeScreen() {
     isRestaurantMenuScreen = true;
   }
 
-  console.log("user___data_in_categories", JSON.stringify(userState));
+  //console.log("user___data_in_categories", JSON.stringify(userState));
 
   if (userState?.customer) {
   } else {
     userData = JSON?.parse(userState);
   }
-  console.log("userData", userData);
+  //console.log("userData", userData);
   const [foodItemList, setFoodItemList] = useState(items);
-  const [addItemName, setAddItemName] = useState<string>("hello");
-  const [addItemPrice, setAddItemPrice] = useState();
-  const [addItemImage, setAddItemImage] = useState();
+  const [addedFoodItem, setAddedFootItem] = useState<addedItemType[]>([]);
+
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
     userData?.customer?.id
   );
   async function getDataFromBackend(token: string | undefined) {
     const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${userData.restaurant.restaurant_id}`;
-    console.log("URL in getting groups is: ", url);
+    //onsole.log("URL in getting groups is: ", url);
     try {
       let response = await fetch(url, {
         method: "GET",
@@ -102,9 +112,9 @@ export default function HomeScreen() {
       });
   });
 
-  console.log("===========heroesList=========================");
-  console.log(JSON.stringify(heroesList));
-  console.log("===========heroesList=========================");
+  //console.log("===========heroesList=========================");
+  //console.log(JSON.stringify(heroesList));
+  //console.log("===========heroesList=========================");
   function renderModal() {
     return (
       showAddItemModal && (
@@ -150,7 +160,14 @@ export default function HomeScreen() {
                 Item name
               </Text>
               <TextInput
-                onChange={(e) => setAddItemName(e.target.value)}
+                onChange={(value) => {
+                  let tempAddedItem = addedFoodItem.filter((item: any) => {
+                    item.name = value;
+                    return item;
+                  });
+                  console.log("temp is", tempAddedItem);
+                  setAddedFootItem(tempAddedItem);
+                }}
                 style={{
                   width: "100%",
                   height: 40,
@@ -171,7 +188,7 @@ export default function HomeScreen() {
               </Text>
               <TextInput
                 onChange={(value) => {
-                  console.log("item", addItemName);
+                  console.log("item", addedFoodItem);
                 }}
                 style={{
                   width: "100%",
