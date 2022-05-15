@@ -67,9 +67,6 @@ export default function HomeScreen() {
   console.log('myyyyuserstate, ', JSON.stringify(userState))
   
  
-  let userData: any;
-  //console.log("userData", userData);
-  //console.log("userState", userState);
   console.log('loadUserFromStorage', JSON.stringify(loadUserFromStorage))
 
   let isRestaurantMenuScreen = false;
@@ -80,20 +77,14 @@ export default function HomeScreen() {
     isRestaurantMenuScreen = true;
   }
 
-  //console.log("user___data_in_categories", JSON.stringify(userState));
 
-  if (userState?.customer) {
-  } else {
-    userData = userState
-  }
-  console.log("userData", userData);
   const [foodItemList, setFoodItemList] = useState(items);
   const [addedFoodItem, setAddedFootItem] = useState<addedItemType[]>([]);
   const [itemName, setItemName] = useState<string>("");
   const [itemPrice, setItemPrice] = useState<string>();
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
-    userData?.customer?.id
+    userState?.customer?.id
   );
   const [imagePath, setImagePath] = useState<string>("");
 
@@ -113,12 +104,12 @@ export default function HomeScreen() {
       });
   }
   async function getDataFromBackend(tempData: any) {
-    const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${parseInt(userData?.customer?.restaurant_id)}`;
+    const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${userState?.customer?.restaurant_id}`;
     console.log("URL in getting groups is: ", url);
     console.log("tempData: ", tempData);
     tempData = JSON.parse(tempData)
     console.log("token: ", tempData.token);
-    console.log("UserData: ", userData);
+    console.log("userState: ", userState);
     try {
       let response = await fetch(url, {
         method: "GET",
@@ -143,25 +134,27 @@ export default function HomeScreen() {
       throw e;
     }
   }
+useEffect(()=>{
+getData()
+},[])
 
-
-
+ function getData(){
   AsyncStorage.getItem(userKey, (err, result) => {
     console.log("User key", result)
     getDataFromBackend(result)
       .then(function (data) {
-        if(foodItemList &&  foodItemList.length > 0){
-          setFoodItemList(data)
-          console.log("dataNis", data?.data);
-        }
-        console.log("dataNis", data);
-
+        // if(foodItemList &&  foodItemList.length > 0){
+          setFoodItemList(data.data)
+        // }
+        console.log("data is", data.data);
+        console.log("data is", data);
         console.log("isRestaurantMenuScreen", isRestaurantMenuScreen);
       })
       .catch((error) => {
-        console.log("error in fetchong data is", error);
+        console.log("error in fetching data is", error);
       });
   });
+ }
 
   //console.log("===========heroesList=========================");
   //console.log(JSON.stringify(heroesList));
@@ -333,7 +326,34 @@ export default function HomeScreen() {
       )
     );
   }
-
+  async function removeFromList(item){
+    try{
+      const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/removeItemFromMenu`;
+      const request = {
+        restaurant_id: userState?.customer?.restaurant_id,
+        item: item
+      }
+      console.log(url)
+      console.log(request)
+      let response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + userState?.token,
+        },
+        body: JSON.stringify(request)
+      });
+      let tempList = foodItemList.filter((foodItem) => {
+        return foodItem.id !== item.id;
+      });
+      setFoodItemList(tempList);
+      console.log("list", tempList);
+    } catch(error){
+      console.log(error)
+    }
+    
+  }
   if (isRestaurantMenuScreen) {
     return (
       <SafeAreaView style={styles.root}>
@@ -356,7 +376,7 @@ export default function HomeScreen() {
                 fontWeight: "bold",
               }}
             >
-              Item List
+              Menu
             </Text>
             <TouchableOpacity
               onPress={() => {
@@ -384,7 +404,9 @@ export default function HomeScreen() {
                 }}
               >
                 <Image
-                  source={require("../../assets/imgs/user.png")}
+                  source={{
+                    uri: "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005" + item.image
+                  }}
                   style={{
                     width: 30,
                     height: 30,
@@ -407,15 +429,12 @@ export default function HomeScreen() {
                     fontWeight: "500",
                   }}
                 >
-                  {item.price}
+                  PKR {item.price}
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    let tempList = foodItemList.filter((foodItem) => {
-                      return foodItem.id !== item.id;
-                    });
-                    setFoodItemList(tempList);
-                    console.log("list", tempList);
+                    removeFromList(item)
+                    
                   }}
                 >
                   <Image
