@@ -73,16 +73,17 @@ export default function ProfileScreen() {
   if (typeof(userState.user) != 'object'){
     userState = JSON.parse(userState.user)
   }
+  else {
+    userState = userState,user
+  }
 
   let isRestaurantMenuScreen = false;
-  console.log("userState", userState?.customer)
+
   if (userState?.customer?.role == 1) {
     isRestaurantMenuScreen = true;
   }
-  else{
-    userState = useAppSelector((state) => state?.user?.user);
-  }
 
+  console.log("userState in profiles2", userState)
 
   
   let userData: any;
