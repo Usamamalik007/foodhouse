@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Image,
 } from "react-native";
 import AppAddToCart from "../../component/AppAddToCart";
 import AppCounterItem from "../../component/AppCounterItem";
@@ -16,6 +17,7 @@ import { useGetCartRequest } from "../../hooks/Cart/useProductToCart";
 import { ICartDataResponse } from "../../interfaces/ICartData";
 import { useAppSelector } from "../../store/hooks";
 import Moment from "moment";
+
 const orders = [
   {
     order_id: 1,
@@ -259,6 +261,8 @@ export default function CartScreen() {
                 <View
                   style={{
                     marginTop: 10,
+                    justifyContent: "space-between",
+                    flexDirection: "row",
                   }}
                 >
                   <Text
@@ -270,6 +274,25 @@ export default function CartScreen() {
                   >
                     {Moment(order.created_at).format(" hh:mm DD-MMM-YY")}
                   </Text>
+                  <TouchableOpacity onPress={() => {}}>
+                    <Image
+                      style={{
+                        height: 24,
+                        width: 24,
+                        marginLeft: 90,
+                      }}
+                      source={require("../../assets/imgs/new_blue_tick_icon.png")}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => {}}>
+                    <Image
+                      style={{
+                        height: 24,
+                        width: 24,
+                      }}
+                      source={require("../../assets/imgs/new-blackish-cross.png")}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
             );
