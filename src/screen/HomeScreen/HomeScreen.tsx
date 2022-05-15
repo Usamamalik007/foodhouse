@@ -30,9 +30,9 @@ import { Product } from "../../interfaces/IProductData";
 import { useAppSelector } from "../../store/hooks";
 
 type addedItemType = {
-  name: string;
-  image: string;
-  price: string;
+  name: any;
+  image: any;
+  price: any;
 };
 const addedItem = {
   name: "name1",
@@ -89,7 +89,8 @@ export default function HomeScreen() {
   console.log("userData", userData);
   const [foodItemList, setFoodItemList] = useState(items);
   const [addedFoodItem, setAddedFootItem] = useState<addedItemType[]>([]);
-
+  const [itemName, setItemName] = useState<string>("");
+  const [itemPrice, setItemPrice] = useState<string>();
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
     userData?.customer?.id
@@ -210,20 +211,18 @@ export default function HomeScreen() {
                 Item name
               </Text>
               <TextInput
-                onChange={(value) => {
-                  let tempAddedItem = addedFoodItem.filter((item: any) => {
-                    item.name = value;
-                    return item;
-                  });
-                  console.log("temp is", tempAddedItem);
-                  setAddedFootItem(tempAddedItem);
+                onChangeText={(value) => {
+                  setItemName(value);
                 }}
+                placeholder={"Item name"}
                 style={{
+                  paddingHorizontal: 20,
                   width: "100%",
                   height: 40,
                   borderWidth: 1,
                   borderRadius: 12,
                   marginTop: 12,
+                  borderColor: "grey",
                 }}
               />
               <Text
@@ -237,15 +236,18 @@ export default function HomeScreen() {
                 Item Price
               </Text>
               <TextInput
-                onChange={(value) => {
-                  console.log("item", addedFoodItem);
+                onChangeText={(value) => {
+                  setItemPrice(value);
                 }}
+                placeholder={"Item price"}
                 style={{
+                  paddingHorizontal: 20,
                   width: "100%",
                   height: 40,
                   borderWidth: 1,
                   borderRadius: 12,
                   marginTop: 12,
+                  borderColor: "grey",
                 }}
               />
               <Text
@@ -269,6 +271,8 @@ export default function HomeScreen() {
                     height: 70,
                     width: 70,
                     borderRadius: 35,
+                    marginTop: 20,
+                    borderColor: "grey",
                   }}
                 >
                   <Image
@@ -290,13 +294,40 @@ export default function HomeScreen() {
                       height: 24,
                       width: 24,
                       marginTop: -50,
-                      marginLeft: 30,
+                      marginLeft: 23,
                     }}
                     source={require("../../assets/imgs/blue-edit-pen.png")}
                   />
                 </View>
               </TouchableOpacity>
             </View>
+            <TouchableOpacity
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                height: 48,
+                marginTop: 30,
+                borderRadius: 12,
+                backgroundColor: "blue",
+              }}
+              onPress={() => {
+                let newObj = {
+                  name: itemName,
+                  price: itemPrice,
+                };
+                console.log("newobj", newObj);
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 24,
+                  fontWeight: "700",
+                  color: "white",
+                }}
+              >
+                Add item
+              </Text>
+            </TouchableOpacity>
           </View>
         </Modal>
       )
