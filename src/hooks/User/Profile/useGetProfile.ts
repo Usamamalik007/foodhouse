@@ -4,7 +4,7 @@ import {IFavouriteData} from '../../../interfaces/IFavouriteData';
 
 async function useGetProfileRequest<T>(id: number) {
   try {
-    const res = await httpCustomer.get<T>('getUserData?role=0');
+    const res = await httpCustomer.get<T>('getUserData');
     console.log(`res.data useGetProfileRequest`, res.data);
     return res.data;
   } catch (err: any) {
