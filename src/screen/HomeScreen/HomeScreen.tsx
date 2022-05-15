@@ -23,7 +23,7 @@ import { useGetAllHeroes } from "../../hooks/Heroes/useGetAllHeroes";
 import { useGetAllFeaturedProduct } from "../../hooks/Product/useGetFeaturedProduct";
 import { IFeatureProductResponse } from "../../interfaces/IFeaturedProductData";
 import { ILocalHeroDataResponse } from "../../interfaces/ILocalHerosData";
-
+import ImagePicker from "react-native-image-crop-picker";
 import { Product } from "../../interfaces/IProductData";
 import { useAppSelector } from "../../store/hooks";
 type addedItemType = {
@@ -76,6 +76,23 @@ export default function HomeScreen() {
   const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
     userData?.customer?.id
   );
+  const [imagePath, setImagePath] = useState<string>("");
+
+  function openImagePicker() {
+    ImagePicker.openPicker({
+      width: 63,
+      height: 63,
+      cropping: true,
+    })
+      .then((image: { path: React.SetStateAction<string> }) => {
+        //@ts-ignore
+        setImagePath(image.path);
+      })
+      .catch((callBack) => {
+        // you forgot to add catch to this promise.
+        console.log(callBack); // Please handle the callBack here.
+      });
+  }
   async function getDataFromBackend(token: string | undefined) {
     const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${userData.restaurant.restaurant_id}`;
     //onsole.log("URL in getting groups is: ", url);
@@ -206,18 +223,46 @@ export default function HomeScreen() {
                   marginTop: 30,
                 }}
               >
-                Image
+                Pick Image
               </Text>
-              <TextInput
-                onChange={(value) => {}}
-                style={{
-                  width: "100%",
-                  height: 40,
-                  borderWidth: 1,
-                  borderRadius: 12,
-                  marginTop: 12,
+              <TouchableOpacity
+                onPress={() => {
+                  openImagePicker();
                 }}
-              />
+              >
+                <View
+                  style={{
+                    borderWidth: 1,
+                    height: 70,
+                    width: 70,
+                    borderRadius: 35,
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri:
+                        imagePath && imagePath.length > 0
+                          ? imagePath
+                          : "https://cdn1.vectorstock.com/i/thumb-large/22/05/male-profile-picture-vector-1862205.jpg",
+                    }}
+                    style={{
+                      height: 70,
+                      width: 70,
+                      borderRadius: 35,
+                    }}
+                    resizeMode={"cover"}
+                  />
+                  <Image
+                    style={{
+                      height: 24,
+                      width: 24,
+                      marginTop: -50,
+                      marginLeft: 30,
+                    }}
+                    source={require("../../assets/imgs/blue-edit-pen.png")}
+                  />
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
