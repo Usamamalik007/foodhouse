@@ -27,9 +27,9 @@ import ImagePicker from "react-native-image-crop-picker";
 import { Product } from "../../interfaces/IProductData";
 import { useAppSelector } from "../../store/hooks";
 type addedItemType = {
-  name: string;
-  image: string;
-  price: string;
+  name: any;
+  image: any;
+  price: any;
 };
 const addedItem = {
   name: "name1",
@@ -71,7 +71,8 @@ export default function HomeScreen() {
   //console.log("userData", userData);
   const [foodItemList, setFoodItemList] = useState(items);
   const [addedFoodItem, setAddedFootItem] = useState<addedItemType[]>([]);
-
+  const [itemName, setItemName] = useState<string>("");
+  const [itemPrice, setItemPrice] = useState<string>();
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
     userData?.customer?.id
@@ -177,13 +178,8 @@ export default function HomeScreen() {
                 Item name
               </Text>
               <TextInput
-                onChange={(value) => {
-                  let tempAddedItem = addedFoodItem.filter((item: any) => {
-                    item.name = value;
-                    return item;
-                  });
-                  console.log("temp is", tempAddedItem);
-                  setAddedFootItem(tempAddedItem);
+                onChangeText={(value) => {
+                  setItemName(value);
                 }}
                 style={{
                   width: "100%",
@@ -204,8 +200,8 @@ export default function HomeScreen() {
                 Item Price
               </Text>
               <TextInput
-                onChange={(value) => {
-                  console.log("item", addedFoodItem);
+                onChangeText={(value) => {
+                  setItemPrice(value);
                 }}
                 style={{
                   width: "100%",
@@ -264,6 +260,30 @@ export default function HomeScreen() {
                 </View>
               </TouchableOpacity>
             </View>
+            <TouchableOpacity
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={() => {
+                let newObj = {
+                  name: itemName,
+                  price: itemPrice,
+                };
+                console.log("newobj", newObj);
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 24,
+                  fontWeight: "700",
+                  color: "blue",
+                  marginTop: 30,
+                }}
+              >
+                Add item
+              </Text>
+            </TouchableOpacity>
           </View>
         </Modal>
       )
