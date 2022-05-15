@@ -14,7 +14,8 @@ import {
   Alert,
 } from "react-native";
 import { string } from "yup";
-import {userKey, loadUserFromStorage} from '../../store/userSlice';
+import { SnackbarSuccess, SnackbarError } from "../../utils/SnackBar";
+import { userKey, loadUserFromStorage } from "../../store/userSlice";
 
 import styles from "../../assets/css/style";
 import AppCaraosaul from "../../component/AppCaraosaul";
@@ -28,6 +29,7 @@ import { ILocalHeroDataResponse } from "../../interfaces/ILocalHerosData";
 import ImagePicker from "react-native-image-crop-picker";
 import { Product } from "../../interfaces/IProductData";
 import { useAppSelector } from "../../store/hooks";
+let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
 
 type addedItemType = {
   name: any;
@@ -53,15 +55,39 @@ const items = [
     price: "price2",
   },
 ];
+let categories = [
+  {
+    id: 1,
+    name: "Burgers",
+  },
+  {
+    id: 2,
+    name: "Beverages",
+  },
+  {
+    id: 3,
+    name: "Sides",
+  },
+  {
+    id: 4,
+    name: "Desserts",
+  },
+  {
+    id: 5,
+    name: "Deals",
+  },
+];
+type categoryType = {
+  id?: any;
+  name?: any;
+};
 export default function HomeScreen() {
-
   let userState: any = useAppSelector((state) => state?.user);
 
-  if (typeof(userState.user) != 'object'){
-    userState = JSON.parse(userState.user)
-  }
-  else {
-    userState = userState.user
+  if (typeof userState.user != "object") {
+    userState = JSON.parse(userState.user);
+  } else {
+    userState = userState.user;
   }
 
   console.log('myyyyuserstate, ', JSON.stringify(userState))
@@ -70,9 +96,9 @@ export default function HomeScreen() {
   console.log('loadUserFromStorage', JSON.stringify(loadUserFromStorage))
 
   let isRestaurantMenuScreen = false;
-  console.log("userState for adeed", userState?.customer)
-  console.log('ussssser key', JSON.stringify(userKey))
-  
+  console.log("userState for adeed", userState?.customer);
+  console.log("ussssser key", JSON.stringify(userKey));
+
   if (userState?.customer?.role == 1) {
     isRestaurantMenuScreen = true;
   }
@@ -83,6 +109,7 @@ export default function HomeScreen() {
   const [itemName, setItemName] = useState<string>("");
   const [itemPrice, setItemPrice] = useState<string>();
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
+  const [selectedCategory, setSelectedCategory] = useState<categoryType>();
   const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
     userState?.customer?.id
   );
@@ -97,6 +124,7 @@ export default function HomeScreen() {
       .then((image: { path: React.SetStateAction<string> }) => {
         //@ts-ignore
         setImagePath(image.path);
+        postImage(image.path);
       })
       .catch((callBack) => {
         // you forgot to add catch to this promise.
@@ -107,7 +135,7 @@ export default function HomeScreen() {
     const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${userState?.customer?.restaurant_id}`;
     console.log("URL in getting groups is: ", url);
     console.log("tempData: ", tempData);
-    tempData = JSON.parse(tempData)
+    tempData = JSON.parse(tempData);
     console.log("token: ", tempData.token);
     console.log("userState: ", userState);
     try {
@@ -115,11 +143,10 @@ export default function HomeScreen() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization:
-            "Bearer " + tempData.token,
+          Authorization: "Bearer " + tempData.token,
         },
       });
-      // response = await response.json(); 
+      // response = await response.json();
       console.log("responseiso", response);
       console.log("token", tempData);
       if (response.status === 200) {
@@ -140,7 +167,7 @@ getData()
 
  function getData(){
   AsyncStorage.getItem(userKey, (err, result) => {
-    console.log("User key", result)
+    console.log("User key", result);
     getDataFromBackend(result)
       .then(function (data) {
         // if(foodItemList &&  foodItemList.length > 0){
@@ -243,6 +270,46 @@ getData()
                   borderColor: "grey",
                 }}
               />
+              <View>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "500",
+                    color: "black",
+                    marginTop: 30,
+                  }}
+                >
+                  Select category
+                </Text>
+                <View style={{}}>
+                  {categories.map((category) => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectedCategory(category);
+                        }}
+                        style={{
+                          width: 150,
+                          height: 48,
+                          backgroundColor:
+                            //@ts-ignore
+                            selectedCategory?.id == category?.id
+                              ? "blue"
+                              : "#ADD8E6",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                          }}
+                        >
+                          {category.name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
               <Text
                 style={{
                   fontSize: 16,
@@ -304,11 +371,11 @@ getData()
                 backgroundColor: "blue",
               }}
               onPress={() => {
-                let newObj = {
+                addItemToMenu({
                   name: itemName,
                   price: itemPrice,
-                };
-                console.log("newobj", newObj);
+                  category: selectedCategory,
+                })
               }}
             >
               <Text
@@ -325,6 +392,69 @@ getData()
         </Modal>
       )
     );
+  }
+
+  async function postImage(image_Path: any) {
+    var form_data = new FormData();
+    form_data.append("image", {
+      uri: image_Path,
+      name: "image.jpg",
+      type: "image/jpg",
+      user_id: userState?.customer?.id
+    });
+    console.log("userState", JSON.stringify(userState));
+
+    console.log("form_data", JSON.stringify(form_data));
+    try {
+      let response:any = await fetch(base_url + "/uploadImageItem", {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization:
+            "Bearer " + userState.token, 
+        },
+        body: form_data,
+      })
+      response = await response.json();
+      console.log("response is", JSON.stringify(response));
+      if (response.statusCode === 200) {
+        setImagePath(response?.data)  
+        SnackbarSuccess(response.message);
+      } else {
+        console.log(JSON.stringify(response))
+        SnackbarError(response.message);
+      }
+    } catch (e) {
+      console.log(JSON.stringify(e))
+      throw e;
+    }
+  }
+
+  async function addItemToMenu(item){
+    try{
+      const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/addItemToMenu`;
+      const request = {
+        restaurant_id: userState?.customer?.restaurant_id,
+        item: item
+      }
+      console.log(url)
+      console.log(request)
+      let response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + userState?.token,
+        },
+        body: JSON.stringify(request)
+      });
+      let tempList = foodItemList
+      tempList.push(item)
+      setFoodItemList(tempList);
+      console.log("list", tempList);
+    } catch(error){
+      console.log(error)
+    }
   }
   async function removeFromList(item){
     try{
@@ -437,17 +567,17 @@ getData()
                     
                   }}
                 >
-                  <Image
-                    style={{
-                      width: 24,
-                      height: 24,
-                    }}
-                    source={require("../../assets/imgs/new-blackish-cross.png")}
-                  />
-                </TouchableOpacity>
-              </View>
-            );
-          })}
+                    <Image
+                      style={{
+                        width: 24,
+                        height: 24,
+                      }}
+                      source={require("../../assets/imgs/new-blackish-cross.png")}
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
         </ScrollView>
       </SafeAreaView>
     );
