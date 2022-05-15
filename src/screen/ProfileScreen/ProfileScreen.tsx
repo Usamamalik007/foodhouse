@@ -74,7 +74,7 @@ export default function ProfileScreen() {
     userState = JSON.parse(userState.user)
   }
   else {
-    userState = userState,user
+    userState = userState.user
   }
 
   let isRestaurantMenuScreen = false;
@@ -235,6 +235,44 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView>
  <Text>Profile Menu for restaurant mananger</Text>
+ <View style={innerStyles.mainProfileCover}>
+        <TouchableOpacity
+          style={{}}
+          onPress={() => {
+            openImagePicker();
+          }}
+        >
+          <Image
+            source={{
+              uri:
+                imagePath && imagePath.length > 0
+                  ? imagePath
+                  : "https://cdn1.vectorstock.com/i/thumb-large/22/05/male-profile-picture-vector-1862205.jpg",
+            }}
+            style={innerStyles.image}
+            resizeMode={"cover"}
+          />
+          <Image
+            style={{
+              height: 24,
+              width: 24,
+              marginTop: -50,
+              marginLeft: 60,
+            }}
+            source={require("../../assets/imgs/blue-edit-pen.png")}
+          />
+        </TouchableOpacity>
+        <View style={{ marginTop: 30, marginRight: 30, width: "35%" }}>
+          <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
+            {getProfile?.data?.data[0]?.fname}
+            {" "}
+            {getProfile?.data?.data[0]?.lname}
+          </Text>
+          <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
+           {getProfile?.data?.data[0]?.mobileno}
+          </Text>
+        </View>
+      </View>
 
  <TouchableOpacity>
    <Text onPress={()=>{
