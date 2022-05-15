@@ -54,8 +54,15 @@ export default function CartScreen() {
 
   const [cartItemList, setCartItemList] = useState([]);
   const [orderList, setOrderList] = useState(orders);
-  const userState: any = useAppSelector((state) => state?.user?.user);
 
+  let userState: any = useAppSelector((state) => state?.user);
+
+  if (typeof(userState.user) != 'object'){
+    userState = JSON.parse(userState.user)
+  }
+  else {
+    userState = userState.user
+  }
   let isRestaurantOrderScreen = false;
 
   if (userState?.customer?.role == 1) {
@@ -166,7 +173,7 @@ export default function CartScreen() {
       throw e;
     }
   }
-  if (!isRestaurantOrderScreen) {
+  if (isRestaurantOrderScreen) {
     return (
       <SafeAreaView
         style={{

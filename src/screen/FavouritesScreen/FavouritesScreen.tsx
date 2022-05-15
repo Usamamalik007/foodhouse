@@ -12,11 +12,20 @@ import {
 import {useAppSelector} from '../../store/hooks';
 
 export default function FavouritesScreen() {
-  const userState: any = useAppSelector(state => state?.user?.user);
+
+
+  let userState: any = useAppSelector((state) => state?.user);
+
+  if (typeof(userState.user) != 'object'){
+    userState = JSON.parse(userState.user)
+  }
+  else {
+    userState = userState.user
+  }
   let userData;
   if (userState?.customer) {
   } else {
-    userData = JSON?.parse(userState);
+    userData = userState
   }
 
 

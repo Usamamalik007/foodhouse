@@ -28,7 +28,7 @@ instanceUser.interceptors.request.use(async function (config) {
   config.timeoutErrorMessage = 'Request Timed Out';
   console.log('Sending Request', config.url);
   if (
-    !excludedUrls.includes(config.url)
+    !excludedUrls.includes(config.url || '')
   ) {
     console.log('if')
     let userData = await AsyncStorage.getItem(userKey);
@@ -45,7 +45,7 @@ instanceCustomer.interceptors.request.use(async function (config) {
   console.log('here it issss')
   console.log(config.url)
   if (
-    !excludedUrls.includes(config.url)
+    !excludedUrls.includes(config.url || '')
   ) {
     console.log('if')
     let userData = await AsyncStorage.getItem(userKey);

@@ -28,6 +28,7 @@ import { useUpdatePhoneNo } from "../../hooks/User/useUpdatePhoneNo";
 import { useAppSelector } from "../../store/hooks";
 import { SnackbarSuccess, SnackbarError } from "../../utils/SnackBar";
 import { useGetProfile } from "../../hooks/User/Profile/useGetProfile";
+
 import ImagePicker from "react-native-image-crop-picker";
 import { sleep } from "react-query/types/core/utils";
 const profileList = [
@@ -62,7 +63,28 @@ const profileList = [
 
 const { width } = Dimensions.get("screen");
 export default function ProfileScreen() {
-  const userState: any = useAppSelector((state) => state?.user?.user);
+
+
+  //console.log("userData", userData);
+  //console.log("userState", userState);
+
+  let userState: any = useAppSelector((state) => state?.user);
+
+  if (typeof(userState.user) != 'object'){
+    userState = JSON.parse(userState.user)
+  }
+
+  let isRestaurantMenuScreen = false;
+  console.log("userState", userState?.customer)
+  if (userState?.customer?.role == 1) {
+    isRestaurantMenuScreen = true;
+  }
+  else{
+    userState = useAppSelector((state) => state?.user?.user);
+  }
+
+
+  
   let userData: any;
   if (userState?.customer) {
   } else {
@@ -70,6 +92,8 @@ export default function ProfileScreen() {
   }
   const dispatch = useDispatch();
   let getProfile: any = useGetProfile(userData?.user?.id);
+
+  console.log('getProfile ', JSON.stringify(getProfile))
   let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
   console.log("dataISNow", JSON.stringify(getProfile));
   useFocusEffect(
@@ -101,7 +125,7 @@ export default function ProfileScreen() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      phoneno: getProfile?.data?.data[0].mobileno,
+      phoneno: '03366720071'
     },
   });
 
@@ -205,6 +229,21 @@ export default function ProfileScreen() {
 
   const no_photo_url =
     "http://panionprodupdated-env.eba-4pmuehik.eu-central-1.elasticbeanstalk.com";
+
+    if (isRestaurantMenuScreen){
+    return (
+      <SafeAreaView>
+ <Text>Profile Menu for restaurant mananger</Text>
+
+ <TouchableOpacity>
+   <Text onPress={()=>{
+      dispatch(logOutUser());
+   }}>Log out</Text>
+ </TouchableOpacity>
+    </SafeAreaView>
+
+    )
+    }
   return (
     <SafeAreaView>
       <View style={innerStyles.mainProfileCover}>

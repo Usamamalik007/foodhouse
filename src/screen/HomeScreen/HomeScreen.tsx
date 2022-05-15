@@ -11,8 +11,10 @@ import {
   TouchableOpacityBase,
   Modal,
   TextInput,
+  Alert,
 } from "react-native";
 import { string } from "yup";
+import {userKey, loadUserFromStorage} from '../../store/userSlice';
 
 import styles from "../../assets/css/style";
 import AppCaraosaul from "../../component/AppCaraosaul";
@@ -26,6 +28,7 @@ import { ILocalHeroDataResponse } from "../../interfaces/ILocalHerosData";
 import ImagePicker from "react-native-image-crop-picker";
 import { Product } from "../../interfaces/IProductData";
 import { useAppSelector } from "../../store/hooks";
+
 type addedItemType = {
   name: string;
   image: string;
@@ -51,13 +54,28 @@ const items = [
   },
 ];
 export default function HomeScreen() {
-  const userState: any = useAppSelector((state) => state?.user?.user);
+
+  let userState: any = useAppSelector((state) => state?.user);
+
+  if (typeof(userState.user) != 'object'){
+    userState = JSON.parse(userState.user)
+  }
+  else {
+    userState = userState.user
+  }
+
+  console.log('myyyyuserstate, ', JSON.stringify(userState))
+  
+ 
   let userData: any;
   //console.log("userData", userData);
   //console.log("userState", userState);
+  console.log('loadUserFromStorage', JSON.stringify(loadUserFromStorage))
 
   let isRestaurantMenuScreen = false;
-
+  console.log("userState for adeed", userState?.customer)
+  console.log('ussssser key', JSON.stringify(userKey))
+  
   if (userState?.customer?.role == 1) {
     isRestaurantMenuScreen = true;
   }
@@ -66,9 +84,9 @@ export default function HomeScreen() {
 
   if (userState?.customer) {
   } else {
-    userData = JSON?.parse(userState);
+    userData = userState
   }
-  //console.log("userData", userData);
+  console.log("userData", userData);
   const [foodItemList, setFoodItemList] = useState(items);
   const [addedFoodItem, setAddedFootItem] = useState<addedItemType[]>([]);
 
@@ -93,20 +111,25 @@ export default function HomeScreen() {
         console.log(callBack); // Please handle the callBack here.
       });
   }
-  async function getDataFromBackend(token: string | undefined) {
-    const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${userData.restaurant.restaurant_id}`;
-    //onsole.log("URL in getting groups is: ", url);
+  async function getDataFromBackend(tempData: any) {
+    const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${parseInt(userData?.customer?.restaurant_id)}`;
+    console.log("URL in getting groups is: ", url);
+    console.log("tempData: ", tempData);
+    tempData = JSON.parse(tempData)
+    console.log("token: ", tempData.token);
+    console.log("UserData: ", userData);
     try {
       let response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization:
-            "Bearer e0788a59678573984bdd906c2e88d7aa1b263edf307183ec2568aa3da1d26e8c",
+            "Bearer " + tempData.token,
         },
       });
+      // response = await response.json(); 
       console.log("responseiso", response);
-      console.log("token", token);
+      console.log("token", tempData);
       if (response.status === 200) {
         let data = await response.json();
         return data;
@@ -119,10 +142,20 @@ export default function HomeScreen() {
       throw e;
     }
   }
-  AsyncStorage.getItem("user_token", (err, result) => {
+
+
+
+  AsyncStorage.getItem(userKey, (err, result) => {
+    console.log("User key", result)
     getDataFromBackend(result)
       .then(function (data) {
+        if(foodItemList &&  foodItemList.length > 0){
+          setFoodItemList(data)
+          console.log("dataNis", data?.data);
+        }
         console.log("dataNis", data);
+
+        console.log("isRestaurantMenuScreen", isRestaurantMenuScreen);
       })
       .catch((error) => {
         console.log("error in fetchong data is", error);
@@ -270,7 +303,7 @@ export default function HomeScreen() {
     );
   }
 
-  if (!isRestaurantMenuScreen) {
+  if (isRestaurantMenuScreen) {
     return (
       <SafeAreaView style={styles.root}>
         {renderModal()}
@@ -309,7 +342,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {foodItemList.map((item) => {
+          {foodItemList && foodItemList.length > 0 && foodItemList.map((item) => {
             return (
               <View
                 style={{

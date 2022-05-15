@@ -25,7 +25,7 @@ function App() {
 const AppBootStrap = React.memo(function () {
   const userState: any = useAppSelector(state => state.user);
   var userdata: any = userState.user;
-  console.log('consoling user data')
+  console.log('consoling user data222')
   console.log(userState.user)
   if (
     !userState.isLoadingStorageData &&
