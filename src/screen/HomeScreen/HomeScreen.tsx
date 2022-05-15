@@ -181,7 +181,9 @@ export default function HomeScreen() {
                 onChangeText={(value) => {
                   setItemName(value);
                 }}
+                placeholder={"Item name"}
                 style={{
+                  paddingHorizontal: 20,
                   width: "100%",
                   height: 40,
                   borderWidth: 1,
@@ -203,7 +205,9 @@ export default function HomeScreen() {
                 onChangeText={(value) => {
                   setItemPrice(value);
                 }}
+                placeholder={"Item price"}
                 style={{
+                  paddingHorizontal: 20,
                   width: "100%",
                   height: 40,
                   borderWidth: 1,
@@ -232,6 +236,8 @@ export default function HomeScreen() {
                     height: 70,
                     width: 70,
                     borderRadius: 35,
+                    marginTop: 20,
+                    borderColor: "grey",
                   }}
                 >
                   <Image
@@ -253,7 +259,7 @@ export default function HomeScreen() {
                       height: 24,
                       width: 24,
                       marginTop: -50,
-                      marginLeft: 30,
+                      marginLeft: 23,
                     }}
                     source={require("../../assets/imgs/blue-edit-pen.png")}
                   />
@@ -264,6 +270,10 @@ export default function HomeScreen() {
               style={{
                 justifyContent: "center",
                 alignItems: "center",
+                height: 48,
+                marginTop: 30,
+                borderRadius: 12,
+                backgroundColor: "blue",
               }}
               onPress={() => {
                 let newObj = {
@@ -277,8 +287,7 @@ export default function HomeScreen() {
                 style={{
                   fontSize: 24,
                   fontWeight: "700",
-                  color: "blue",
-                  marginTop: 30,
+                  color: "white",
                 }}
               >
                 Add item
