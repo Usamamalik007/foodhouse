@@ -189,6 +189,7 @@ export default function HomeScreen() {
                   borderWidth: 1,
                   borderRadius: 12,
                   marginTop: 12,
+                  borderColor: "grey",
                 }}
               />
               <Text
@@ -213,6 +214,7 @@ export default function HomeScreen() {
                   borderWidth: 1,
                   borderRadius: 12,
                   marginTop: 12,
+                  borderColor: "grey",
                 }}
               />
               <Text
