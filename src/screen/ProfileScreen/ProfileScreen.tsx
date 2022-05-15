@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   AsyncStorage,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
@@ -63,18 +64,18 @@ const profileList = [
 
 const { width } = Dimensions.get("screen");
 export default function ProfileScreen() {
-
+  const [imagePath, setImagePath] = useState<string>("");
 
   //console.log("userData", userData);
   //console.log("userState", userState);
 
   let userState: any = useAppSelector((state) => state?.user);
-
+  
   if (typeof(userState.user) != 'object'){
     userState = JSON.parse(userState.user)
   }
   else {
-    userState = userState,user
+    userState = userState.user
   }
 
   let isRestaurantMenuScreen = false;
@@ -92,13 +93,17 @@ export default function ProfileScreen() {
     userData = JSON?.parse(userState);
   }
   const dispatch = useDispatch();
-  let getProfile: any = useGetProfile(userData?.user?.id);
+  var getProfile: any = useGetProfile(userData?.user?.id);
 
-  console.log('getProfile ', JSON.stringify(getProfile))
+  console.log('getProfile ', JSON.stringify(getProfile?.data?.data[0]))
+
   let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
   console.log("dataISNow", JSON.stringify(getProfile));
   useFocusEffect(
+
     React.useCallback(() => {
+
+      console.log('focusss')
       getProfile.refetch();
       fetchData();
       // setTimeout(() => {
@@ -110,10 +115,12 @@ export default function ProfileScreen() {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
   async function fetchData() {
-    await sleep(1000);
+
     console.log(getProfile?.data?.data[0])
     setImagePath(base_url + getProfile?.data?.data[0]?.image);
   }
+
+
 
   const navigation = useNavigation<any>();
   const [openOrderModal, setOpenOrderModal] = useState<boolean>(false);
@@ -181,8 +188,6 @@ export default function ProfileScreen() {
 
 
 
-  const [imagePath, setImagePath] = useState<string>("");
-
   function openImagePicker() {
     ImagePicker.openPicker({
       width: 63,
@@ -191,39 +196,41 @@ export default function ProfileScreen() {
     }).then((image: { path: React.SetStateAction<string> }) => {
       //@ts-ignore
       setImagePath(image.path);
-      postImage();
+      postImage(image.path);
     }).catch((callBack)=>{ // you forgot to add catch to this promise.
       console.log(callBack); // Please handle the callBack here.
      });
   }
   console.log("image path is", imagePath);
-  async function postImage() {
+  async function postImage(image_Path) {
     var form_data = new FormData();
     form_data.append("image", {
-      uri: imagePath,
+      uri: image_Path,
       name: "image.jpg",
       type: "image/jpg",
     });
-    form_data.append("user_id", getProfile?.data?.data[0].id);
-    console.log("form_data", form_data);
+
+    console.log("form_data", JSON.stringify(form_data));
     try {
       let response:any = await fetch(base_url + "/uploadImage", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization:
-            "Bearer e0788a59678573984bdd906c2e88d7aa1b263edf307183ec2568aa3da1d26e8c",
+            "Bearer " + userState.token, 
         },
         body: form_data,
-      });
+      })
       response = await response.json();
       console.log("response is", JSON.stringify(response));
       if (response.statusCode === 200) {
         SnackbarSuccess(response.message);
       } else {
+        console.log(JSON.stringify(response))
         SnackbarError(response.message);
       }
     } catch (e) {
+      console.log(JSON.stringify(e))
       throw e;
     }
   }
@@ -235,6 +242,44 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView>
  <Text>Profile Menu for restaurant mananger</Text>
+ <View style={innerStyles.mainProfileCover}>
+        <TouchableOpacity
+          style={{}}
+          onPress={() => {
+            openImagePicker();
+          }}
+        >
+          <Image
+            source={{
+              uri:
+                imagePath && imagePath.length > 0
+                  ? imagePath
+                  : "https://cdn1.vectorstock.com/i/thumb-large/22/05/male-profile-picture-vector-1862205.jpg",
+            }}
+            style={innerStyles.image}
+            resizeMode={"cover"}
+          />
+          <Image
+            style={{
+              height: 24,
+              width: 24,
+              marginTop: -50,
+              marginLeft: 60,
+            }}
+            source={require("../../assets/imgs/blue-edit-pen.png")}
+          />
+        </TouchableOpacity>
+        <View style={{ marginTop: 30, marginRight: 30, width: "35%" }}>
+          <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
+            {getProfile?.data?.data[0]?.fname}
+            {" "}
+            {getProfile?.data?.data[0]?.lname}
+          </Text>
+          <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
+           {getProfile?.data?.data[0]?.mobileno}
+          </Text>
+        </View>
+      </View>
 
  <TouchableOpacity>
    <Text onPress={()=>{
