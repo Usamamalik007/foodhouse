@@ -39,7 +39,7 @@ export default function AppCounterItem({
           <Text style={[innerStyles.text, {marginTop: 10}]}>{productName}</Text>
           <Text style={[innerStyles.text, {marginTop: 10}]}>Quantity: {quantity}</Text>
           <Text style={[innerStyles.text, {marginTop: 10}]}>
-           Price per item: ${productPrice}
+           Price per item: PKR {productPrice}
           </Text>
         </View>
 

@@ -36,25 +36,8 @@ type addedItemType = {
   image: any;
   price: any;
 };
-const addedItem = {
-  name: "name1",
-  image: "image1",
-  price: "price1",
-};
-const items = [
-  {
-    id: "id1",
-    name: "name1",
-    image: "image1",
-    price: "price1",
-  },
-  {
-    id: "id2",
-    name: "name2",
-    image: "image2",
-    price: "price2",
-  },
-];
+const addedItem = {};
+const items: any = [];
 let categories = [
   {
     id: 1,

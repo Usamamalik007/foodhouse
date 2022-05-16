@@ -11,21 +11,24 @@ import {
   Alert,
   Image,
 } from "react-native";
+import { SnackbarSuccess, SnackbarError } from "../../utils/SnackBar";
 import AppAddToCart from "../../component/AppAddToCart";
 import AppCounterItem from "../../component/AppCounterItem";
 import AppTextTitle from "../../component/AppTextTitle";
 import { useGetCartRequest } from "../../hooks/Cart/useProductToCart";
 import { ICartDataResponse } from "../../interfaces/ICartData";
 import { userKey, loadUserFromStorage } from "../../store/userSlice";
+import { useRoute } from '@react-navigation/native';
 import { useAppSelector } from "../../store/hooks";
 import Moment from "moment";
 
 
 const orders: any = [];
-
 export default function CartScreen() {
   // let cartItemList = useGetCartRequest<ICartDataResponse>().data;
-
+  const router = useRoute();
+  const { params } = router;
+  const restaurant_id = params?.restaurant_id
   const navigation = useNavigation<any>();
 
   const [cartItemList, setCartItemList] = useState([]);
@@ -145,7 +148,7 @@ export default function CartScreen() {
           headers: {
             "Content-Type": "application/json",
             Authorization:
-              "Bearer e0788a59678573984bdd906c2e88d7aa1b263edf307183ec2568aa3da1d26e8c",
+            "Bearer " + userState.token,
           },
         }
       );
@@ -157,6 +160,42 @@ export default function CartScreen() {
         // SnackbarSuccess(response.message);
       } else {
         // SnackbarError(response.message);
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+  async function addOrder(user_id: number) {
+    let form_data = {
+      user_id: user_id,
+      restaurant_id: restaurant_id,
+    };
+
+    console.log(form_data);
+    console.log(restaurant_id);
+    console.log(router.params);
+    console.log(router);
+
+    try {
+      let response: any = await fetch(
+        "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/addOrder",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+            "Bearer " + userState.token,
+          },
+          body: JSON.stringify(form_data),
+        }
+      );
+      response = await response.json();
+      console.log("response is", JSON.stringify(response));
+      if (response.statusCode === 200) {
+        // navigation.navigate('HomeScreen');
+        SnackbarSuccess(response.message);
+      } else {
+        SnackbarError(response.message);
       }
     } catch (e) {
       throw e;
@@ -179,7 +218,7 @@ export default function CartScreen() {
           headers: {
             "Content-Type": "application/json",
             Authorization:
-              "Bearer e0788a59678573984bdd906c2e88d7aa1b263edf307183ec2568aa3da1d26e8c",
+            "Bearer " + userState.token,
           },
           body: JSON.stringify(form_data),
         }
@@ -207,7 +246,7 @@ export default function CartScreen() {
           headers: {
             "Content-Type": "application/json",
             Authorization:
-              "Bearer e0788a59678573984bdd906c2e88d7aa1b263edf307183ec2568aa3da1d26e8c",
+            "Bearer " + userState.token,
           },
           body: JSON.stringify(form_data),
         }
@@ -411,6 +450,9 @@ export default function CartScreen() {
           <Text>Clear Cart</Text>
         </TouchableOpacity>
         <TouchableOpacity
+        onPress={() => {
+          addOrder(userState?.customer?.user_id);
+        }}
           style={{
             borderWidth: 1,
             marginTop: 30,

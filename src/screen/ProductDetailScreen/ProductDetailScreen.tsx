@@ -33,7 +33,7 @@ function ProductDetailScreen(props: any) {
           <Text style={innerStyles.productName}>{product.name}</Text>
           <AppFavourite />
         </View>
-        <Text style={innerStyles.currentPrice}> ${product.amount}</Text>
+        <Text style={innerStyles.currentPrice}>PKR {product.amount}</Text>
         <Text style={innerStyles.productName}>Quantity</Text>
         <TextInput 
    style={{borderWidth: 1}}
