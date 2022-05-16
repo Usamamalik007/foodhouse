@@ -202,12 +202,13 @@ export default function ProfileScreen() {
      });
   }
   console.log("image path is", imagePath);
-  async function postImage(image_Path) {
+  async function postImage(image_Path: any) {
     var form_data = new FormData();
     form_data.append("image", {
       uri: image_Path,
       name: "image.jpg",
       type: "image/jpg",
+      user_id: userState?.customer?.id
     });
 
     console.log("form_data", JSON.stringify(form_data));

@@ -17,8 +17,11 @@ type CatalagueSections =
   | 'Home'
   | 'MenShoe'
   | 'LadiesBags';
-
-export default function AppOurFavoritesList(categoryList: any) {
+type AppProps = {
+  selectCategory: any,
+  categoryList: any
+}
+export default function AppOurFavoritesList  (props: any) {
   const [profileSection, setProfileSection] =
     useState<CatalagueSections>('TopAndShirts');
   const carouselItems = [
@@ -28,7 +31,12 @@ export default function AppOurFavoritesList(categoryList: any) {
     'Desserts',
     'Deals',
   ];
-  console.log('categoryList is: ', JSON.stringify(categoryList))
+  // console.log('categoryList is: ', JSON.stringify(categoryList))
+  const {
+    categoryList,
+    selectCategory
+  } = props
+  console.log('adeed props', props)
   return (
     <View>
       <View style={{flexShrink: 0}}>
@@ -36,12 +44,14 @@ export default function AppOurFavoritesList(categoryList: any) {
           contentContainerStyle={[{flexDirection: 'row'}, styles.pb5]}
           horizontal={true}
           showsHorizontalScrollIndicator={false}>
-          {categoryList && categoryList.categoryList?.length > 0 && categoryList.categoryList.map((item, index) => {
+          {categoryList && categoryList?.length > 0 && categoryList.map((item, index) => {
             return (
               <TouchableOpacity
                 key={index}
                 onPress={() => {
                   setProfileSection('TopAndShirts');
+
+                  props.selectCategory(index)
                 }}
                 style={[
                   styles.p10,
@@ -52,7 +62,7 @@ export default function AppOurFavoritesList(categoryList: any) {
                     marginLeft: 5,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    backgroundColor:'#429b44'
+                    backgroundColor: item.selected ? '#429b44' : 'blue'
                   },
                 ]}>
                   <Text

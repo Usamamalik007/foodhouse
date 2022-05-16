@@ -5,7 +5,7 @@ import {
   IRemoveFavouriteResponse,
 } from '../../interfaces/IFavouriteData';
 
-function useAddFavouriteRequest(data: IAddFavouriteRequest) {
+function useAddFavouriteRequest(data: any) {
   console.log(`data useAddFavouriteRequest`, data);
   return httpCustomer
     .post<any>('addFavouriteItem', data)
@@ -21,7 +21,7 @@ export function useAddFavourite(
   options: UseMutationOptions<
     IRemoveFavouriteResponse,
     Error,
-    IAddFavouriteRequest,
+    any,
     unknown
   >,
 ) {

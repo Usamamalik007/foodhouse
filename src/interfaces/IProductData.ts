@@ -2,17 +2,10 @@ export type ProductList = Product[];
 export interface Product {
   id: number;
   name: string;
-  amount: number;
-  quantity: number;
-  weight: string;
-  description: string;
-  stock_status: string;
-  is_published: boolean;
   image: string;
-  created_at: string;
-  updated_at: string;
-  default_image_id?: DefaultImageId;
-  productDiscount?: ProductDiscount;
+  key: string;
+  amount?: string;
+  restaurantId? : string;
   is_wishlist:boolean
 }
 

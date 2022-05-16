@@ -14,6 +14,7 @@ import {
   Alert,
 } from "react-native";
 import { string } from "yup";
+import { SnackbarSuccess, SnackbarError } from "../../utils/SnackBar";
 import { userKey, loadUserFromStorage } from "../../store/userSlice";
 
 import styles from "../../assets/css/style";
@@ -28,6 +29,7 @@ import { ILocalHeroDataResponse } from "../../interfaces/ILocalHerosData";
 import ImagePicker from "react-native-image-crop-picker";
 import { Product } from "../../interfaces/IProductData";
 import { useAppSelector } from "../../store/hooks";
+let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
 
 type addedItemType = {
   name: any;
@@ -88,12 +90,10 @@ export default function HomeScreen() {
     userState = userState.user;
   }
 
-  console.log("myyyyuserstate, ", JSON.stringify(userState));
-
-  let userData: any;
-  //console.log("userData", userData);
-  //console.log("userState", userState);
-  console.log("loadUserFromStorage", JSON.stringify(loadUserFromStorage));
+  console.log('myyyyuserstate, ', JSON.stringify(userState))
+  
+ 
+  console.log('loadUserFromStorage', JSON.stringify(loadUserFromStorage))
 
   let isRestaurantMenuScreen = false;
   console.log("userState for adeed", userState?.customer);
@@ -103,22 +103,17 @@ export default function HomeScreen() {
     isRestaurantMenuScreen = true;
   }
 
-  //console.log("user___data_in_categories", JSON.stringify(userState));
 
-  if (userState?.customer) {
-  } else {
-    userData = userState;
-  }
-  console.log("userData", userData);
   const [foodItemList, setFoodItemList] = useState(items);
   const [addedFoodItem, setAddedFootItem] = useState<addedItemType[]>([]);
   const [itemName, setItemName] = useState<string>("");
   const [itemPrice, setItemPrice] = useState<string>();
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<categoryType>();
-  const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
-    userData?.customer?.id
-  );
+  // const heroesList: any = ;
+
+
+    
   const [imagePath, setImagePath] = useState<string>("");
 
   function openImagePicker() {
@@ -130,21 +125,63 @@ export default function HomeScreen() {
       .then((image: { path: React.SetStateAction<string> }) => {
         //@ts-ignore
         setImagePath(image.path);
+        postImage(image.path);
       })
       .catch((callBack) => {
         // you forgot to add catch to this promise.
         console.log(callBack); // Please handle the callBack here.
       });
   }
+
+  async function selectCategory(index: number) {
+    let tempList = JSON.parse(JSON.stringify(categoriesAndRestaurants));
+    console.log("====================================tempList?.data?.categories",tempList?.data?.categories)
+    if(tempList?.data?.categories){
+      tempList.data.categories[index].selected = !tempList.data?.categories[index].selected
+      console.log("-----------------------------------categoriesAndRestaurants?.data?.categories",categoriesAndRestaurants?.data?.categories)
+      console.log("-----------------------------------tempList",tempList.data?.categories)
+      let dataToSend:any = {
+        categories  : []
+      }
+      for(let item of tempList.data?.categories){
+        console.log(item)
+        if(item.selected){
+          dataToSend.categories.push(item.id)
+        }
+      }
+      let response:any = await fetch(base_url + "/getRestaurantsByCategories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + userState?.token, 
+        },
+        body: JSON.stringify(dataToSend)
+      })
+      console.log("dataToSend is", JSON.stringify(dataToSend));
+
+      response = await response.json();
+      console.log("response is", JSON.stringify(response));
+      if (response.statusCode === 200) {
+        // tempList = JSON.parse(JSON.stringify(categoriesAndRestaurants))
+        console.log("--------------------------------------------------------------response",response)
+        tempList.data.restaurants = response?.data;
+        setCategoriesAndRestaurants(tempList)  
+        SnackbarSuccess(response.message);
+      } else {
+        setCategoriesAndRestaurants(tempList)
+        console.log(JSON.stringify(response))
+        SnackbarError(response.message);
+      }
+    }
+  }
   async function getDataFromBackend(tempData: any) {
-    const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${parseInt(
-      userData?.customer?.restaurant_id
-    )}`;
+    const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${userState?.customer?.restaurant_id}`;
     console.log("URL in getting groups is: ", url);
     console.log("tempData: ", tempData);
     tempData = JSON.parse(tempData);
     console.log("token: ", tempData.token);
-    console.log("UserData: ", userData);
+    console.log("userState: ", userState);
     try {
       let response = await fetch(url, {
         method: "GET",
@@ -168,27 +205,50 @@ export default function HomeScreen() {
       throw e;
     }
   }
+  const [categoriesAndRestaurants, setCategoriesAndRestaurants] = useState<any>();
+useEffect(()=>{
+  if(isRestaurantMenuScreen){
+    getData()
+  } else{
+    getRestaurantsAndCategoriesFunc()
+  }
+},[])
+async function getRestaurantsAndCategoriesFunc(){
+  let response:any = await fetch(base_url + "/getRestaurantsAndCategories", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:
+        "Bearer " + userState.token, 
+    }
+  })
+  response = await response.json()
+  if (response.statusCode === 200) {
+    setCategoriesAndRestaurants(response)  
+    SnackbarSuccess(response.message);
+  } else {
+    console.log(JSON.stringify(response))
+    SnackbarError(response.message);
+  }
+ }
 
+ function getData(){
   AsyncStorage.getItem(userKey, (err, result) => {
     console.log("User key", result);
     getDataFromBackend(result)
       .then(function (data) {
-        if (foodItemList && foodItemList.length > 0) {
-          setFoodItemList(data);
-          console.log("dataNis", data?.data);
-        }
-        console.log("dataNis", data);
-
+        // if(foodItemList &&  foodItemList.length > 0){
+          setFoodItemList(data.data)
+        // }
+        console.log("data is", data.data);
+        console.log("data is", data);
         console.log("isRestaurantMenuScreen", isRestaurantMenuScreen);
       })
       .catch((error) => {
-        console.log("error in fetchong data is", error);
+        console.log("error in fetching data is", error);
       });
   });
-
-  //console.log("===========heroesList=========================");
-  //console.log(JSON.stringify(heroesList));
-  //console.log("===========heroesList=========================");
+ }
   function renderModal() {
     return (
       showAddItemModal && (
@@ -284,13 +344,14 @@ export default function HomeScreen() {
                 >
                   Select category
                 </Text>
-                <View style={{}}>
+                <View style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap'
+                }}>
                   {categories.map((category) => {
                     return (
                       <View
-                        style={{
-                          justifyContent: "space-around",
-                        }}
+                    
                       >
                         <TouchableOpacity
                           onPress={() => {
@@ -299,14 +360,18 @@ export default function HomeScreen() {
                           style={{
                             justifyContent: "center",
                             alignItems: "center",
-
+                            marginTop: 10,
                             width: 150,
-                            height: 48,
+                            height: 40,
+                            marginLeft: 5,
                             backgroundColor:
                               //@ts-ignore
-                              selectedCategory.id == category.id
+                              selectedCategory?.id == category.id
                                 ? "blue"
-                                : "#ADD8E6",
+                                : "red",
+                          
+                            borderRadius: 20,
+                            
                           }}
                         >
                           <Text
@@ -383,12 +448,12 @@ export default function HomeScreen() {
                 backgroundColor: "blue",
               }}
               onPress={() => {
-                let newObj = {
+                addItemToMenu({
                   name: itemName,
                   price: itemPrice,
                   category: selectedCategory,
-                };
-                console.log("newobj", newObj);
+                })
+                setShowAddItemModal(false)
               }}
             >
               <Text
@@ -407,6 +472,96 @@ export default function HomeScreen() {
     );
   }
 
+  async function postImage(image_Path: any) {
+    var form_data = new FormData();
+    form_data.append("image", {
+      uri: image_Path,
+      name: "image.jpg",
+      type: "image/jpg",
+      user_id: userState?.customer?.id
+    });
+    console.log("userState", JSON.stringify(userState));
+
+    console.log("form_data", JSON.stringify(form_data));
+    try {
+      let response:any = await fetch(base_url + "/uploadImageItem", {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization:
+            "Bearer " + userState.token, 
+        },
+        body: form_data,
+      })
+      response = await response.json();
+      console.log("response is", JSON.stringify(response));
+      if (response.statusCode === 200) {
+        setImagePath(response?.data)  
+        SnackbarSuccess(response.message);
+      } else {
+        console.log(JSON.stringify(response))
+        SnackbarError(response.message);
+      }
+    } catch (e) {
+      console.log(JSON.stringify(e))
+      throw e;
+    }
+  }
+
+  async function addItemToMenu(item){
+    try{
+      const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/addItemToMenu`;
+      const request = {
+        restaurant_id: userState?.customer?.restaurant_id,
+        item: item
+      }
+      console.log(url)
+      console.log(request)
+      let response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + userState?.token,
+        },
+        body: JSON.stringify(request)
+      });
+      let tempList = foodItemList
+      tempList.push(item)
+      setFoodItemList(tempList);
+      console.log("list", tempList);
+    } catch(error){
+      console.log(error)
+    }
+  }
+  async function removeFromList(item){
+    try{
+      const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/removeItemFromMenu`;
+      const request = {
+        restaurant_id: userState?.customer?.restaurant_id,
+        item: item
+      }
+      console.log(url)
+      console.log(request)
+      let response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + userState?.token,
+        },
+        body: JSON.stringify(request)
+      });
+      let tempList = foodItemList.filter((foodItem) => {
+        return foodItem.id !== item.id;
+      });
+      setFoodItemList(tempList);
+      console.log("list", tempList);
+    } catch(error){
+      console.log(error)
+    }
+    
+  }
   if (isRestaurantMenuScreen) {
     return (
       <SafeAreaView style={styles.root}>
@@ -429,7 +584,7 @@ export default function HomeScreen() {
                 fontWeight: "bold",
               }}
             >
-              Item List
+              Menu
             </Text>
             <TouchableOpacity
               onPress={() => {
@@ -446,53 +601,53 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {foodItemList &&
-            foodItemList.length > 0 &&
-            foodItemList.map((item) => {
-              return (
-                <View
+          {foodItemList && foodItemList.length > 0 && foodItemList.map((item) => {
+            return (
+              <View
+                style={{
+                  marginTop: 30,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={{
+                    uri: "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005" + item.image
+                  }}
                   style={{
-                    marginTop: 30,
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                  }}
+                />
+                <Text
+                numberOfLines={2}
+                  style={{
+                    color: "black",
+                    fontSize: 18,
+                    fontWeight: "500",
+                    width: 100
                   }}
                 >
-                  <Image
-                    source={require("../../assets/imgs/user.png")}
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 15,
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: "black",
-                      fontSize: 18,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {item.name}
-                  </Text>
-                  <Text
-                    style={{
-                      color: "black",
-                      fontSize: 18,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {item.price}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      let tempList = foodItemList.filter((foodItem) => {
-                        return foodItem.id !== item.id;
-                      });
-                      setFoodItemList(tempList);
-                      console.log("list", tempList);
-                    }}
-                  >
+                  {item.name}
+                </Text>
+                <Text
+                  style={{
+                    color: "black",
+                    fontSize: 18,
+                    fontWeight: "500",
+                    
+                  }}
+                >
+                  PKR {item.price}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    removeFromList(item)
+                    
+                  }}
+                >
                     <Image
                       style={{
                         width: 24,
@@ -508,6 +663,9 @@ export default function HomeScreen() {
       </SafeAreaView>
     );
   }
+  console.log("=====================================categoriesAndRestaurants", categoriesAndRestaurants)
+  console.log("=====================================categoriesAndRestaurants", categoriesAndRestaurants?.data?.categories)
+  console.log("=====================================categoriesAndRestaurants", categoriesAndRestaurants?.data?.restaurants)
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView>
@@ -523,13 +681,14 @@ export default function HomeScreen() {
             >
               Categories
             </Text>
-            {!heroesList.isLoading && heroesList.data?.data?.categories ? (
+            {!categoriesAndRestaurants?.isLoading && categoriesAndRestaurants?.data?.categories ? (
               <AppOurFavoritesList
-                categoryList={heroesList.data.data.categories}
+                categoryList={categoriesAndRestaurants?.data?.categories}
+                selectCategory = {selectCategory}
               />
             ) : null}
           </View>
-          {!heroesList.isLoading && heroesList?.data?.data && (
+          {!categoriesAndRestaurants?.isLoading && categoriesAndRestaurants?.data && (
             <View style={styles.mt10}>
               <Text style={[styles.ffgt, styles.fs20, { color: "#34283E" }]}>
                 Restaurants
@@ -541,7 +700,7 @@ export default function HomeScreen() {
                   justifyContent: "space-between",
                 }}
               >
-                {heroesList?.data.data.restaurants?.map(
+                {categoriesAndRestaurants?.data?.restaurants?.map(
                   (individualProduct: any, index: any) => {
                     console.log(`individualProduct`, individualProduct);
                     return (
