@@ -284,10 +284,7 @@ getData()
                 <View style={{}}>
                   {categories.map((category) => {
                     return (
-                      <TouchableOpacity
-                        onPress={() => {
-                          setSelectedCategory(category);
-                        }}
+                      <View
                         style={{
                           width: 150,
                           height: 48,
@@ -296,16 +293,35 @@ getData()
                             selectedCategory?.id == category?.id
                               ? "blue"
                               : "#ADD8E6",
+                          justifyContent: "space-around",
                         }}
                       >
-                        <Text
+                        <TouchableOpacity
+                          onPress={() => {
+                            setSelectedCategory(category);
+                          }}
                           style={{
-                            color: "white",
+                            justifyContent: "center",
+                            alignItems: "center",
+
+                            width: 150,
+                            height: 48,
+                            backgroundColor:
+                              //@ts-ignore
+                              selectedCategory.id == category.id
+                                ? "blue"
+                                : "#ADD8E6",
                           }}
                         >
-                          {category.name}
-                        </Text>
-                      </TouchableOpacity>
+                          <Text
+                            style={{
+                              color: "white",
+                            }}
+                          >
+                            {category.name}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     );
                   })}
                 </View>
