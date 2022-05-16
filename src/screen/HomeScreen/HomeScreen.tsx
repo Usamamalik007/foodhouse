@@ -260,14 +260,14 @@ async function getRestaurantsAndCategoriesFunc(){
                 color: "black",
               }}
             >
-              Enter the following data to add item
+              Add Item
             </Text>
             <View
               style={{
-                marginTop: 30,
+                marginTop: 10,
               }}
             >
-              <Text
+              {/* <Text
                 style={{
                   fontSize: 16,
                   fontWeight: "500",
@@ -275,7 +275,49 @@ async function getRestaurantsAndCategoriesFunc(){
                 }}
               >
                 Item name
-              </Text>
+              </Text> */}
+              
+              <TouchableOpacity
+                onPress={() => {
+                  openImagePicker();
+                }}
+              >
+                <View
+                  style={{
+                    borderWidth: 1,
+                    height: 70,
+                    width: 70,
+                    borderRadius: 35,
+                    marginBottom: 20,
+                    marginTop: 20,
+                    borderColor: "lightgrey",
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri:
+                        imagePath && imagePath.length > 0
+                          ? base_url+ imagePath
+                          : "https://cdn1.vectorstock.com/i/thumb-large/22/05/male-profile-picture-vector-1862205.jpg",
+                    }}
+                    style={{
+                      height: 70,
+                      width: 70,
+                      borderRadius: 35,
+                    }}
+                    resizeMode={"cover"}
+                  />
+                  <Image
+                    style={{
+                      height: 24,
+                      width: 24,
+                      marginTop: -50,
+                      marginLeft: 23,
+                    }}
+                    source={require("../../assets/imgs/blue-edit-pen.png")}
+                  />
+                </View>
+              </TouchableOpacity>
               <TextInput
                 onChangeText={(value) => {
                   setItemName(value);
@@ -291,7 +333,7 @@ async function getRestaurantsAndCategoriesFunc(){
                   borderColor: "grey",
                 }}
               />
-              <Text
+              {/* <Text
                 style={{
                   fontSize: 16,
                   fontWeight: "500",
@@ -300,7 +342,7 @@ async function getRestaurantsAndCategoriesFunc(){
                 }}
               >
                 Item Price
-              </Text>
+              </Text> */}
               <TextInput
                 onChangeText={(value) => {
                   setItemPrice(value);
@@ -317,7 +359,7 @@ async function getRestaurantsAndCategoriesFunc(){
                 }}
               />
               <View>
-                <Text
+                {/* <Text
                   style={{
                     fontSize: 16,
                     fontWeight: "500",
@@ -325,8 +367,8 @@ async function getRestaurantsAndCategoriesFunc(){
                     marginTop: 30,
                   }}
                 >
-                  Select category
-                </Text>
+                  Category
+                </Text> */}
                 <View style={{
                   flexDirection: 'row',
                   flexWrap: 'wrap'
@@ -350,8 +392,8 @@ async function getRestaurantsAndCategoriesFunc(){
                             backgroundColor:
                               //@ts-ignore
                               selectedCategory?.id == category.id
-                                ? "blue"
-                                : "red",
+                                ? "#429b44"
+                                : "blue",
                           
                             borderRadius: 20,
                             
@@ -370,7 +412,7 @@ async function getRestaurantsAndCategoriesFunc(){
                   })}
                 </View>
               </View>
-              <Text
+              {/* <Text
                 style={{
                   fontSize: 16,
                   fontWeight: "500",
@@ -378,48 +420,8 @@ async function getRestaurantsAndCategoriesFunc(){
                   marginTop: 30,
                 }}
               >
-                Pick Image
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  openImagePicker();
-                }}
-              >
-                <View
-                  style={{
-                    borderWidth: 1,
-                    height: 70,
-                    width: 70,
-                    borderRadius: 35,
-                    marginTop: 20,
-                    borderColor: "grey",
-                  }}
-                >
-                  <Image
-                    source={{
-                      uri:
-                        imagePath && imagePath.length > 0
-                          ? imagePath
-                          : "https://cdn1.vectorstock.com/i/thumb-large/22/05/male-profile-picture-vector-1862205.jpg",
-                    }}
-                    style={{
-                      height: 70,
-                      width: 70,
-                      borderRadius: 35,
-                    }}
-                    resizeMode={"cover"}
-                  />
-                  <Image
-                    style={{
-                      height: 24,
-                      width: 24,
-                      marginTop: -50,
-                      marginLeft: 23,
-                    }}
-                    source={require("../../assets/imgs/blue-edit-pen.png")}
-                  />
-                </View>
-              </TouchableOpacity>
+               Image
+              </Text> */}
             </View>
             <TouchableOpacity
               style={{
@@ -428,7 +430,7 @@ async function getRestaurantsAndCategoriesFunc(){
                 height: 48,
                 marginTop: 30,
                 borderRadius: 12,
-                backgroundColor: "blue",
+                backgroundColor: "#429b44",
               }}
               onPress={() => {
                 addItemToMenu({
@@ -441,12 +443,12 @@ async function getRestaurantsAndCategoriesFunc(){
             >
               <Text
                 style={{
-                  fontSize: 24,
-                  fontWeight: "700",
+                  fontSize: 18,
+                  fontWeight: "400",
                   color: "white",
                 }}
               >
-                Add item
+                Add to menu
               </Text>
             </TouchableOpacity>
           </View>
