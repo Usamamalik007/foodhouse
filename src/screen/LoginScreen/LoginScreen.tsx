@@ -147,14 +147,13 @@ function LoginScreen() {
             alignItems: 'center',
             marginBottom: 10,
           }}>
-          <Text style={innerStyles.plainText}>Want to Register your restaurant?</Text>
-          <Text style={innerStyles.boldText}>Register Restaurant</Text>
+          <Text style={innerStyles.boldText}>Register Restaurant?</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             navigation.navigate('ForgetScreen');
           }}>
-          <Text style={innerStyles.forgetPassword}>Forget Password</Text>
+          <Text style={innerStyles.forgetPassword}>Forgot Password?</Text>
         </TouchableOpacity>
       </View>
     </View>

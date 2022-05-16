@@ -110,9 +110,10 @@ export default function HomeScreen() {
   const [itemPrice, setItemPrice] = useState<string>();
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<categoryType>();
-  const heroesList: any = useGetAllHeroes<IFeatureProductResponse[]>(
-    userState?.customer?.id
-  );
+  // const heroesList: any = ;
+
+
+    
   const [imagePath, setImagePath] = useState<string>("");
 
   function openImagePicker() {
@@ -130,6 +131,49 @@ export default function HomeScreen() {
         // you forgot to add catch to this promise.
         console.log(callBack); // Please handle the callBack here.
       });
+  }
+
+  async function selectCategory(index: number) {
+    let tempList = JSON.parse(JSON.stringify(categoriesAndRestaurants));
+    console.log("====================================tempList?.data?.categories",tempList?.data?.categories)
+    if(tempList?.data?.categories){
+      tempList.data.categories[index].selected = !tempList.data?.categories[index].selected
+      console.log("-----------------------------------categoriesAndRestaurants?.data?.categories",categoriesAndRestaurants?.data?.categories)
+      console.log("-----------------------------------tempList",tempList.data?.categories)
+      let dataToSend:any = {
+        categories  : []
+      }
+      for(let item of tempList.data?.categories){
+        console.log(item)
+        if(item.selected){
+          dataToSend.categories.push(item.id)
+        }
+      }
+      let response:any = await fetch(base_url + "/getRestaurantsByCategories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + userState?.token, 
+        },
+        body: JSON.stringify(dataToSend)
+      })
+      console.log("dataToSend is", JSON.stringify(dataToSend));
+
+      response = await response.json();
+      console.log("response is", JSON.stringify(response));
+      if (response.statusCode === 200) {
+        // tempList = JSON.parse(JSON.stringify(categoriesAndRestaurants))
+        console.log("--------------------------------------------------------------response",response)
+        tempList.data.restaurants = response?.data;
+        setCategoriesAndRestaurants(tempList)  
+        SnackbarSuccess(response.message);
+      } else {
+        setCategoriesAndRestaurants(tempList)
+        console.log(JSON.stringify(response))
+        SnackbarError(response.message);
+      }
+    }
   }
   async function getDataFromBackend(tempData: any) {
     const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantMenu?restaurant_id=${userState?.customer?.restaurant_id}`;
@@ -161,9 +205,32 @@ export default function HomeScreen() {
       throw e;
     }
   }
+  const [categoriesAndRestaurants, setCategoriesAndRestaurants] = useState<any>();
 useEffect(()=>{
-getData()
+  if(isRestaurantMenuScreen){
+    getData()
+  } else{
+    getRestaurantsAndCategoriesFunc()
+  }
 },[])
+async function getRestaurantsAndCategoriesFunc(){
+  let response:any = await fetch(base_url + "/getRestaurantsAndCategories", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:
+        "Bearer " + userState.token, 
+    }
+  })
+  response = await response.json()
+  if (response.statusCode === 200) {
+    setCategoriesAndRestaurants(response)  
+    SnackbarSuccess(response.message);
+  } else {
+    console.log(JSON.stringify(response))
+    SnackbarError(response.message);
+  }
+ }
 
  function getData(){
   AsyncStorage.getItem(userKey, (err, result) => {
@@ -182,10 +249,6 @@ getData()
       });
   });
  }
-
-  //console.log("===========heroesList=========================");
-  //console.log(JSON.stringify(heroesList));
-  //console.log("===========heroesList=========================");
   function renderModal() {
     return (
       showAddItemModal && (
@@ -308,7 +371,7 @@ getData()
                             height: 48,
                             backgroundColor:
                               //@ts-ignore
-                              selectedCategory.id == category.id
+                              selectedCategory?.id == category.id
                                 ? "blue"
                                 : "#ADD8E6",
                           }}
@@ -598,6 +661,9 @@ getData()
       </SafeAreaView>
     );
   }
+  console.log("=====================================categoriesAndRestaurants", categoriesAndRestaurants)
+  console.log("=====================================categoriesAndRestaurants", categoriesAndRestaurants?.data?.categories)
+  console.log("=====================================categoriesAndRestaurants", categoriesAndRestaurants?.data?.restaurants)
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView>
@@ -613,13 +679,14 @@ getData()
             >
               Categories
             </Text>
-            {!heroesList.isLoading && heroesList.data?.data?.categories ? (
+            {!categoriesAndRestaurants?.isLoading && categoriesAndRestaurants?.data?.categories ? (
               <AppOurFavoritesList
-                categoryList={heroesList.data.data.categories}
+                categoryList={categoriesAndRestaurants?.data?.categories}
+                selectCategory = {selectCategory}
               />
             ) : null}
           </View>
-          {!heroesList.isLoading && heroesList?.data?.data && (
+          {!categoriesAndRestaurants?.isLoading && categoriesAndRestaurants?.data && (
             <View style={styles.mt10}>
               <Text style={[styles.ffgt, styles.fs20, { color: "#34283E" }]}>
                 Restaurants
@@ -631,7 +698,7 @@ getData()
                   justifyContent: "space-between",
                 }}
               >
-                {heroesList?.data.data.restaurants?.map(
+                {categoriesAndRestaurants?.data?.restaurants?.map(
                   (individualProduct: any, index: any) => {
                     console.log(`individualProduct`, individualProduct);
                     return (

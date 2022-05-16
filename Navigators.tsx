@@ -9,6 +9,7 @@ import RestaurantRegistrationScreen from "./src/screen/RestaurantRegistrationScr
 import HomeScreen from "./src/screen/HomeScreen/HomeScreen";
 import CatalogueScreen from "./src/screen/CatalogueScreen/CatalogueScreen";
 import FavouritesScreen from "./src/screen/FavouritesScreen/FavouritesScreen";
+import { useAppSelector } from "./src/store/hooks";
 import ProfileScreen from "./src/screen/ProfileScreen/ProfileScreen";
 import CartScreen from "./src/screen/CartScreen/CartScreen";
 import { appColors } from "./src/utils/colors";
@@ -16,8 +17,6 @@ import AppHamburgerMenu from "./src/component/AppHamburgerMenu";
 import RegistrationScreen from "./src/screen/RegistrationScreen/RegistrationScreen";
 import ForgetScreen from "./src/screen/ForgetScreen/ForgetScreen";
 import CatalogueScreenLvlTwo from "./src/screen/CatalogueScreen/CatalogueScreenLvlTwo";
-import AppSearchBarHeader from "./src/component/AppSearchBar";
-import SearchScreen from "./src/screen/SearchScreen/SearchScreen";
 import AppHeaderBackButton from "./src/component/AppHeaderBackButton";
 import ItemScreen from "./src/screen/ItemScreen/ItemScreen";
 import ProductDetailScreen from "./src/screen/ProductDetailScreen/ProductDetailScreen";
@@ -62,33 +61,76 @@ const LogoTitle340 = () => {
 export function MainFlow() {
   const isRole = tempData.toString().includes("role");
   console.log("dataisNowOuui", JSON.stringify(tempData));
+  let isRestaurantMenuScreen = false;
+  let userState: any = useAppSelector((state) => state?.user);
+
+  if (typeof userState.user != "object") {
+    userState = JSON.parse(userState.user);
+  } else {
+    userState = userState.user;
+  }
+  if (userState?.customer?.role == 1) {
+    isRestaurantMenuScreen = true;
+  }
+  console.log("======================================isRestaurantMenuScreen", isRestaurantMenuScreen)
+  if(!isRestaurantMenuScreen){
+  console.log("======================================BottomTabNavigator")
   return (
-    <MainStack.Navigator
-      initialRouteName="AppAddAddress"
-      // initialRouteName="BottomTabNavigator"
-      screenOptions={{
-        headerTintColor: "black",
-        cardStyle: { backgroundColor: "#fff" },
-      }}
-    >
-      <MainStack.Screen
-        options={{
-          headerShown: false,
+      <MainStack.Navigator
+        initialRouteName="AppAddAddress"
+        screenOptions={{
+          headerTintColor: "black",
+          cardStyle: { backgroundColor: "#fff" },
         }}
-        // const AppUserBasicProfile={AppUserBasicProfile}
-        name="BottomTabNavigator"
-        component={BottomTabNavigator}
-      />
-      {/* <MainStack.Screen
-        options={{
-          headerShown: false,
+      >
+        <MainStack.Screen
+          options={{
+            headerShown: false,
+          }}
+          // const AppUserBasicProfile={AppUserBasicProfile}
+          name="BottomTabNavigator"
+          component={BottomTabNavigator}
+        />
+        {/* <MainStack.Screen
+          options={{
+            headerShown: false,
+          }}
+          // const AppUserBasicProfile={AppUserBasicProfile}
+          name="SecondBottomTabNavigator"
+          component={SecondBottomTabNavigator}
+        /> */}
+      </MainStack.Navigator>
+    );
+  } else{
+    console.log("======================================SecondBottomTabNavigator")
+    return (
+      <MainStack.Navigator
+        initialRouteName="AppAddAddress"
+        screenOptions={{
+          headerTintColor: "black",
+          cardStyle: { backgroundColor: "#fff" },
         }}
-        // const AppUserBasicProfile={AppUserBasicProfile}
-        name="SecondBottomTabNavigator"
-        component={SecondBottomTabNavigator}
-      /> */}
-    </MainStack.Navigator>
-  );
+      >
+        <MainStack.Screen
+          options={{
+            headerShown: false,
+          }}
+          // const AppUserBasicProfile={AppUserBasicProfile}
+          name="SecondBottomTabNavigator"
+          component={SecondBottomTabNavigator}
+        />
+        {/* <MainStack.Screen
+          options={{
+            headerShown: false,
+          }}
+          // const AppUserBasicProfile={AppUserBasicProfile}
+          name="SecondBottomTabNavigator"
+          component={SecondBottomTabNavigator}
+        /> */}
+      </MainStack.Navigator>
+    );
+  }
+ 
 }
 
 export function AuthFlow() {
@@ -133,7 +175,23 @@ export function AuthFlow() {
 }
 function SecondBottomTabNavigator() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName = "home";
+          if (route.name === "MainScreenStack") {
+            iconName = focused ? "restaurant" : "restaurant-outline";
+          } else if (route.name === "CartScreenStack") {
+            iconName = focused ? "list" : "list-outline";
+          } else if (route.name === "ProfileScreenStack") {
+            iconName = focused ? "person" : "person-outline";
+          }
+          return (
+            <Ionicons name={iconName} size={size} color={appColors.darkGrey} />
+          );
+        },
+      })}
+    >
       <Tab.Screen
         name="MainScreenStack"
         options={{
@@ -141,6 +199,22 @@ function SecondBottomTabNavigator() {
           headerShown: false,
         }}
         component={MainScreenStack}
+      />
+      <Tab.Screen
+        name="CartScreenStack"
+        options={{
+          tabBarShowLabel: false,
+          headerShown: false,
+        }}
+        component={CartScreenStack}
+      />
+      <Tab.Screen
+        name="ProfileScreenStack"
+        options={{
+          tabBarShowLabel: false,
+          headerShown: false,
+        }}
+        component={ProfileScreenStack}
       />
     </Tab.Navigator>
   );
@@ -153,8 +227,6 @@ function BottomTabNavigator() {
           let iconName = "home";
           if (route.name === "MainScreenStack") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "CatalogueScreenStack") {
-            iconName = focused ? "grid" : "grid-outline";
           } else if (route.name === "CartScreenStack") {
             iconName = focused ? "cart" : "cart-outline";
           } else if (route.name === "FavouritesScreenStack") {
@@ -175,14 +247,6 @@ function BottomTabNavigator() {
           headerShown: false,
         }}
         component={MainScreenStack}
-      />
-      <Tab.Screen
-        name="CatalogueScreenStack"
-        options={{
-          tabBarShowLabel: false,
-          headerShown: false,
-        }}
-        component={CatalogueScreenStack}
       />
       <Tab.Screen
         name="CartScreenStack"
@@ -218,7 +282,6 @@ function MainScreenStack() {
         // headerLeft: () => <AppHamburgerMenu />,
         headerLeft: () => <></>,
         headerTitle: () => <LogoTitle340 />,
-        headerRight: () => <AppSearchBarHeader />,
       }}
     >
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
@@ -259,100 +322,6 @@ function MainScreenStack() {
           title: "Update Address",
         }}
       />
-      <Stack.Screen
-        name="SearchScreen"
-        component={SearchScreen}
-        options={{
-          headerLeft: () => <AppHeaderBackButton />,
-          title: "Update Address",
-        }}
-      />
-    </Stack.Navigator>
-  );
-}
-
-function CatalogueScreenStack() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        // headerLeft: () => <AppHamburgerMenu />,
-        headerLeft: () => <></>,
-        headerTitle: () => <LogoTitle340 />,
-        headerRight: () => <AppSearchBarHeader />,
-      }}
-    >
-      <Stack.Screen name="CatalogueScreen" component={CatalogueScreen} />
-
-      <Stack.Screen
-        name="CatalogueScreenLvlTwo"
-        options={{
-          headerTitle: () => <LogoTitle260 />,
-          headerLeft: () => <AppHeaderBackButton />,
-        }}
-        component={CatalogueScreenLvlTwo}
-      />
-
-      <Stack.Screen
-        name="CatalogueScreenLvlThree"
-        options={{
-          headerTitle: () => <LogoTitle260 />,
-          headerLeft: () => <AppHeaderBackButton />,
-        }}
-        component={CatalogueScreenLvlThree}
-      />
-
-      <Stack.Screen
-        name="CatalogueScreenLvlFour"
-        options={{
-          headerTitle: () => <LogoTitle260 />,
-          headerLeft: () => <AppHeaderBackButton />,
-        }}
-        component={CatalogueScreenLvlFour}
-      />
-      <Stack.Screen
-        name="ItemScreen"
-        component={ItemScreen}
-        options={{
-          headerTitle: () => <LogoTitle260 />,
-          headerLeft: () => <AppHeaderBackButton />,
-        }}
-      />
-
-      <Stack.Screen
-        name="ProductFilterScreen"
-        component={ProductFilterScreen}
-        options={{
-          headerLeft: () => <AppHeaderBackButton />,
-        }}
-      />
-      <Stack.Screen
-        name="ProductDetailScreen"
-        component={ProductDetailScreen}
-      />
-      <Stack.Screen
-        name="AppAddAddress"
-        options={{
-          headerLeft: () => <AppHeaderBackButton />,
-          title: "Update Address",
-        }}
-        component={AppAddAddress}
-      />
-      <Stack.Screen
-        name="AppUpdateAddress"
-        component={AppUpdateAddress}
-        options={{
-          headerLeft: () => <AppHeaderBackButton />,
-          title: "Add Address",
-        }}
-      />
-      <Stack.Screen
-        name="SearchScreen"
-        component={SearchScreen}
-        options={{
-          headerLeft: () => <AppHeaderBackButton />,
-          title: "Update Address",
-        }}
-      />
     </Stack.Navigator>
   );
 }
@@ -364,7 +333,6 @@ function CartScreenStack() {
         // headerLeft: () => <AppHamburgerMenu />,
         headerLeft: () => <></>,
         headerTitle: () => <LogoTitle340 />,
-        headerRight: () => <AppSearchBarHeader />,
       }}
     >
       <Stack.Screen name="CartScreen" component={CartScreen} />
@@ -418,14 +386,6 @@ function CartScreenStack() {
           title: "Update Address",
         }}
       />
-      <Stack.Screen
-        name="SearchScreen"
-        component={SearchScreen}
-        options={{
-          headerLeft: () => <AppHeaderBackButton />,
-          title: "Update Address",
-        }}
-      />
     </Stack.Navigator>
   );
 }
@@ -437,7 +397,6 @@ function FavouritesScreenStack() {
         // headerLeft: () => <AppHamburgerMenu />,
         headerLeft: () => <></>,
         headerTitle: () => <LogoTitle340 />,
-        headerRight: () => <AppSearchBarHeader />,
       }}
     >
       <Stack.Screen name="FavouritesScreen" component={FavouritesScreen} />
@@ -476,14 +435,6 @@ function FavouritesScreenStack() {
           title: "Update Address",
         }}
       />
-      <Stack.Screen
-        name="SearchScreen"
-        component={SearchScreen}
-        options={{
-          headerLeft: () => <AppHeaderBackButton />,
-          title: "Update Address",
-        }}
-      />
     </Stack.Navigator>
   );
 }
@@ -495,7 +446,6 @@ function ProfileScreenStack() {
         // headerLeft: () => <AppHamburgerMenu />,
         headerLeft: () => <></>,
         headerTitle: () => <LogoTitle340 />,
-        headerRight: () => <AppSearchBarHeader />,
       }}
     >
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
@@ -545,14 +495,7 @@ function ProfileScreenStack() {
         name="AppUserBasicProfile"
         component={AppUserBasicProfile}
       />
-      <Stack.Screen
-        name="SearchScreen"
-        component={SearchScreen}
-        options={{
-          headerLeft: () => <AppHeaderBackButton />,
-          title: "Update Address",
-        }}
-      />
+     
     </Stack.Navigator>
   );
 }

@@ -7,7 +7,7 @@ import {
 
 
 
-function useRemoveFavouriteRequest(data: IRemoveFavouriteRequest) {
+function useRemoveFavouriteRequest(data: any) {
   console.log(`data IRemoveFavouriteRequest`, data);
   return httpCustomer
     .post<any>('deleteFavouriteItem', data)
@@ -23,7 +23,7 @@ export function useRemoveFavourite(
   options: UseMutationOptions<
     IRemoveFavouriteResponse,
     Error,
-    IRemoveFavouriteRequest,
+    any,
     unknown
   >,
 ) {

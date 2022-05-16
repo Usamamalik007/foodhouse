@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  AsyncStorage,
   StyleSheet,
   Alert,
   Image,
@@ -15,39 +16,13 @@ import AppCounterItem from "../../component/AppCounterItem";
 import AppTextTitle from "../../component/AppTextTitle";
 import { useGetCartRequest } from "../../hooks/Cart/useProductToCart";
 import { ICartDataResponse } from "../../interfaces/ICartData";
+import { userKey, loadUserFromStorage } from "../../store/userSlice";
 import { useAppSelector } from "../../store/hooks";
 import Moment from "moment";
 
 
-const orders = [
-  {
-    order_id: 1,
-    status: "Pending",
-    restaurant_image: "/publicImages/mcdonalds.png",
-    created_at: "2022-05-07T12:53:46.000Z",
-    customer_id: 8,
-    restaurant_id: 1,
-    restaurant_name: "McDonald's",
-  },
-  {
-    order_id: 2,
-    status: "Pending",
-    restaurant_image: "/publicImages/mcdonalds.png",
-    created_at: "2022-05-07T12:53:46.000Z",
-    customer_id: 8,
-    restaurant_id: 1,
-    restaurant_name: "McDonald's",
-  },
-  {
-    order_id: 3,
-    status: "Pending",
-    restaurant_image: "/publicImages/mcdonalds.png",
-    created_at: "2022-05-07T12:53:46.000Z",
-    customer_id: 8,
-    restaurant_id: 1,
-    restaurant_name: "McDonald's",
-  },
-];
+const orders: any = [];
+
 export default function CartScreen() {
   // let cartItemList = useGetCartRequest<ICartDataResponse>().data;
 
@@ -55,6 +30,56 @@ export default function CartScreen() {
 
   const [cartItemList, setCartItemList] = useState([]);
   const [orderList, setOrderList] = useState(orders);
+  useEffect(()=>{
+    getData()
+    },[])
+    
+     function getData(){
+      AsyncStorage.getItem(userKey, (err, result) => {
+        console.log("User key", result);
+        getDataFromBackend(result)
+          .then(function (data) {
+            // if(foodItemList &&  foodItemList.length > 0){
+              setOrderList(data.data)
+            // }
+            console.log("data is", data.data);
+            console.log("data is", data);
+          })
+          .catch((error) => {
+            console.log("error in fetching data is", error);
+          });
+      });
+     }
+     async function getDataFromBackend(tempData: any) {
+      const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getRestaurantOrders`;
+      console.log("URL in getting groups is: ", url);
+      console.log("tempData: ", tempData);
+      tempData = JSON.parse(tempData);
+      console.log("token: ", tempData.token);
+      console.log("userState: ", userState);
+      try {
+        let response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + tempData.token,
+          },
+        });
+        // response = await response.json();
+        console.log("responseiso", response);
+        console.log("token", tempData);
+        if (response.status === 200) {
+          let data = await response.json();
+          return data;
+        } else {
+          let data = await response.json();
+          throw data;
+        }
+      } catch (e) {
+        console.log("responseiso", e);
+        throw e;
+      }
+    }
 
   let userState: any = useAppSelector((state) => state?.user);
 
@@ -85,6 +110,31 @@ export default function CartScreen() {
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
+
+  async function updateOrderStatus(item: any, status: Boolean){
+    try{
+      const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/setOrderStatus`;
+      const request = {
+        order_id: item.order_id,
+        status: status
+      }
+      console.log("------------------------", item);
+      console.log(url)
+      console.log(request)
+      let response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + userState?.token,
+        },
+        body: JSON.stringify(request)
+      });
+      await getData()
+    } catch(error){
+      console.log(error)
+    }
+  }
 
   async function getCartItemList() {
     try {
@@ -233,7 +283,7 @@ export default function CartScreen() {
               Time
             </Text>
           </View> */}
-          {orderList.map((order) => {
+          {orderList.map((order: any) => {
             return (
               <View
                 style={{
@@ -282,25 +332,36 @@ export default function CartScreen() {
                   >
                     {Moment(order.created_at).format(" hh:mm DD-MMM-YY")}
                   </Text>
-                  <TouchableOpacity onPress={() => {}}>
-                    <Image
-                      style={{
-                        height: 24,
-                        width: 24,
-                        marginLeft: 90,
-                      }}
-                      source={require("../../assets/imgs/new_blue_tick_icon.png")}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => {}}>
-                    <Image
-                      style={{
-                        height: 24,
-                        width: 24,
-                      }}
-                      source={require("../../assets/imgs/new-blackish-cross.png")}
-                    />
-                  </TouchableOpacity>
+                  {
+                    order.status === "Pending" && <View>
+                       <TouchableOpacity onPress={() => {
+                      updateOrderStatus(order, true);
+                      console.log("------------------------",order)
+                    }}>
+                      <Image
+                        style={{
+                          height: 24,
+                          width: 24,
+                          marginLeft: 90,
+                        }}
+                        source={require("../../assets/imgs/new_blue_tick_icon.png")}
+                      />
+                    </TouchableOpacity>
+                     <TouchableOpacity onPress={() => {
+                      updateOrderStatus(order, false);
+                      console.log("------------------------",order)
+                    }}>
+                      <Image
+                        style={{
+                          height: 24,
+                          width: 24,
+                        }}
+                        source={require("../../assets/imgs/new-blackish-cross.png")}
+                      />
+                    </TouchableOpacity>
+                    </View>
+                  }
+                 
                 </View>
               </View>
             );
@@ -362,7 +423,7 @@ export default function CartScreen() {
         {cartItemList &&
           cartItemList.data &&
           cartItemList.data.length > 0 &&
-          cartItemList?.data.map((cartItem, index) => {
+          cartItemList?.data.map((cartItem: any, index: any) => {
             return (
               <AppCounterItem
                 key={index}

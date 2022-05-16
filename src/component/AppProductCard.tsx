@@ -16,7 +16,6 @@ import {SnackbarSuccess} from '../utils/SnackBar';
 import {CalculatePercentage} from '../utils/CalculatePercentage';
 
 function AppProductCard(productData: Product) {
-  console.log(`productDiscount`, productData.productDiscount?.discount);
   const {
     control,
     handleSubmit,
@@ -90,21 +89,7 @@ function AppProductCard(productData: Product) {
           }>
           <Text style={innerStyles.productName}>{productData.name}</Text>
 
-          {productData.productDiscount && (
-            <View style={innerStyles.priceContainer}>
-              <Text style={innerStyles.currentPrice}>
-                PKR {productData.amount}
-              </Text>
-            </View>
-          )}
 
-          {productData.productDiscount == null && (
-            <View style={innerStyles.priceContainer}>
-              <Text style={innerStyles.currentPriceWithoutDiscount}>
-                PKR {productData.amount}
-              </Text>
-            </View>
-          )}
         </TouchableOpacity>
       </View>
     </View>

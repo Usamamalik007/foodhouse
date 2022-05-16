@@ -9,13 +9,12 @@ import {useForm} from 'react-hook-form';
 
 import {Product} from '../interfaces/IProductData';
 import {useAddFavourite} from '../hooks/Favourites/useAddFavourite';
-import {IAddFavouriteRequest} from '../interfaces/IFavouriteData';
 import {useAppSelector} from '../store/hooks';
 import {useRemoveFavourite} from '../hooks/Favourites/useRemoveFavourite';
 import {SnackbarSuccess} from '../utils/SnackBar';
 import {CalculatePercentage} from '../utils/CalculatePercentage';
 
-function AppResturantsCard(productData: Product) {
+function AppResturantsCard(productData: any) {
   console.log(`productDiscount`, productData.productDiscount?.discount);
   const {
     control,

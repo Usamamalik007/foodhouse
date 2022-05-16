@@ -227,6 +227,17 @@ function RegistrationScreen() {
           <Text style={innerStyles.plainText}>You have an account?</Text>
           <Text style={innerStyles.boldText}>Login</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('RestaurantRegistrationScreen');
+          }}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 10,
+          }}>
+          <Text style={innerStyles.boldText}>Register Restaurant?</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
