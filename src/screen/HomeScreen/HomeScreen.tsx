@@ -327,20 +327,14 @@ async function getRestaurantsAndCategoriesFunc(){
                 >
                   Select category
                 </Text>
-                <View style={{}}>
+                <View style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap'
+                }}>
                   {categories.map((category) => {
                     return (
                       <View
-                        style={{
-                          width: 150,
-                          height: 48,
-                          backgroundColor:
-                            //@ts-ignore
-                            selectedCategory?.id == category?.id
-                              ? "blue"
-                              : "#ADD8E6",
-                          justifyContent: "space-around",
-                        }}
+                    
                       >
                         <TouchableOpacity
                           onPress={() => {
@@ -349,14 +343,18 @@ async function getRestaurantsAndCategoriesFunc(){
                           style={{
                             justifyContent: "center",
                             alignItems: "center",
-
+                            marginTop: 10,
                             width: 150,
-                            height: 48,
+                            height: 40,
+                            marginLeft: 5,
                             backgroundColor:
                               //@ts-ignore
                               selectedCategory?.id == category.id
                                 ? "blue"
-                                : "#ADD8E6",
+                                : "red",
+                          
+                            borderRadius: 20,
+                            
                           }}
                         >
                           <Text
@@ -438,6 +436,7 @@ async function getRestaurantsAndCategoriesFunc(){
                   price: itemPrice,
                   category: selectedCategory,
                 })
+                setShowAddItemModal(false)
               }}
             >
               <Text
@@ -606,10 +605,12 @@ async function getRestaurantsAndCategoriesFunc(){
                   }}
                 />
                 <Text
+                numberOfLines={2}
                   style={{
                     color: "black",
                     fontSize: 18,
                     fontWeight: "500",
+                    width: 100
                   }}
                 >
                   {item.name}
@@ -619,6 +620,7 @@ async function getRestaurantsAndCategoriesFunc(){
                     color: "black",
                     fontSize: 18,
                     fontWeight: "500",
+                    
                   }}
                 >
                   PKR {item.price}
