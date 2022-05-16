@@ -306,15 +306,25 @@ export default function CartScreen() {
                   >
                     {order.restaurant_name}
                   </Text>
-                  <Text
+                 <View style={{
+                   backgroundColor: 'blue',
+                   height: 35,
+                   borderRadius: 17.5,
+                   justifyContent: 'center',
+                   alignItems: 'center',
+                   width: 120
+                 }}>
+                 <Text
                     style={{
-                      color: "black",
+                      color: "white",
                       fontSize: 18,
                       fontWeight: "500",
+                      
                     }}
                   >
                     {order.status}
                   </Text>
+                 </View>
                 </View>
                 <View
                   style={{
@@ -325,7 +335,7 @@ export default function CartScreen() {
                 >
                   <Text
                     style={{
-                      color: "black",
+                      color: "grey",
                       fontSize: 14,
                       fontWeight: "500",
                     }}
@@ -333,7 +343,11 @@ export default function CartScreen() {
                     {Moment(order.created_at).format(" hh:mm DD-MMM-YY")}
                   </Text>
                   {
-                    order.status === "Pending" && <View>
+                    order.status === "Pending" && <View style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      width: 200
+                    }}>
                        <TouchableOpacity onPress={() => {
                       updateOrderStatus(order, true);
                       console.log("------------------------",order)
