@@ -5,7 +5,6 @@ import {
   Text,
   SafeAreaView,
   ScrollView,
-  AsyncStorage,
   Image,
   TouchableOpacity,
   TouchableOpacityBase,
@@ -13,7 +12,10 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { string } from "yup";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { appColors } from "../../../src/utils/colors";
 import { SnackbarSuccess, SnackbarError } from "../../utils/SnackBar";
 import { userKey, loadUserFromStorage } from "../../store/userSlice";
 
@@ -255,8 +257,9 @@ async function getRestaurantsAndCategoriesFunc(){
           >
             <Text
               style={{
-                fontSize: 20,
-                fontWeight: "500",
+                
+                fontSize: 16,
+                fontWeight: "600",
                 color: "black",
               }}
             >
@@ -290,7 +293,7 @@ async function getRestaurantsAndCategoriesFunc(){
                     borderRadius: 35,
                     marginBottom: 20,
                     marginTop: 20,
-                    borderColor: "lightgrey",
+                    borderColor: imagePath && imagePath.length > 0 ? "white" : "lightgrey",
                   }}
                 >
                   <Image
@@ -298,7 +301,7 @@ async function getRestaurantsAndCategoriesFunc(){
                       uri:
                         imagePath && imagePath.length > 0
                           ? base_url+ imagePath
-                          : "https://cdn1.vectorstock.com/i/thumb-large/22/05/male-profile-picture-vector-1862205.jpg",
+                          : "https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg",
                     }}
                     style={{
                       height: 70,
@@ -307,6 +310,7 @@ async function getRestaurantsAndCategoriesFunc(){
                     }}
                     resizeMode={"cover"}
                   />
+
                   <Image
                     style={{
                       height: 24,
@@ -314,7 +318,7 @@ async function getRestaurantsAndCategoriesFunc(){
                       marginTop: -50,
                       marginLeft: 23,
                     }}
-                    source={require("../../assets/imgs/blue-edit-pen.png")}
+                    source={require("../../assets/imgs/Camera-add-black.png")}
                   />
                 </View>
               </TouchableOpacity>
@@ -393,7 +397,7 @@ async function getRestaurantsAndCategoriesFunc(){
                               //@ts-ignore
                               selectedCategory?.id == category.id
                                 ? "#429b44"
-                                : "blue",
+                                : "#24a0ed",
                           
                             borderRadius: 20,
                             
@@ -402,6 +406,8 @@ async function getRestaurantsAndCategoriesFunc(){
                           <Text
                             style={{
                               color: "white",
+                              fontWeight: "500",
+                              lineHeight: 26
                             }}
                           >
                             {category.name}
@@ -439,12 +445,14 @@ async function getRestaurantsAndCategoriesFunc(){
                   category: selectedCategory,
                 })
                 setShowAddItemModal(false)
+                setImagePath("")
               }}
             >
               <Text
                 style={{
-                  fontSize: 18,
-                  fontWeight: "400",
+                  
+                  fontSize: 16,
+                  fontWeight: "600",
                   color: "white",
                 }}
               >
@@ -493,7 +501,7 @@ async function getRestaurantsAndCategoriesFunc(){
     }
   }
 
-  async function addItemToMenu(item){
+  async function addItemToMenu(item:any){
     try{
       const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/addItemToMenu`;
       const request = {
@@ -519,7 +527,7 @@ async function getRestaurantsAndCategoriesFunc(){
       console.log(error)
     }
   }
-  async function removeFromList(item){
+  async function removeFromList(item:any){
     try{
       const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/removeItemFromMenu`;
       const request = {
@@ -537,7 +545,7 @@ async function getRestaurantsAndCategoriesFunc(){
         },
         body: JSON.stringify(request)
       });
-      let tempList = foodItemList.filter((foodItem) => {
+      let tempList = foodItemList.filter((foodItem:any) => {
         return foodItem.id !== item.id;
       });
       setFoodItemList(tempList);
@@ -565,82 +573,92 @@ async function getRestaurantsAndCategoriesFunc(){
             <Text
               style={{
                 color: "black",
-                fontSize: 20,
-                fontWeight: "bold",
+                fontSize: 16,
+                fontWeight: "600",
               }}
             >
               Menu
             </Text>
+            <View style={{alignItems: 'flex-end', marginRight: 7}}>
             <TouchableOpacity
               onPress={() => {
                 setShowAddItemModal(true);
               }}
-            >
-              <Image
+            > 
+              <Ionicons name="add-outline" size={30} color={appColors.darkGrey} />
+              {/* <Image
                 style={{
                   width: 24,
                   height: 24,
                 }}
                 source={require("../../assets/imgs/new_plus_icon.png")}
-              />
+              /> */}
             </TouchableOpacity>
+            </View>
           </View>
 
-          {foodItemList && foodItemList.length > 0 && foodItemList.map((item) => {
+          {foodItemList && foodItemList.length > 0 && foodItemList.map((item:any) => {
             return (
               <View
                 style={{
-                  marginTop: 30,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  borderWidth: 2,
+                  borderRadius: 8,
+                  borderColor: '#FAF9F6',
+                  shadowColor: '#E2DFD2',
+    elevation: 5,
+    shadowOpacity: 0.9,
                 }}
               >
-                <Image
-                  source={{
-                    uri: "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005" + item.image
-                  }}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 15,
-                  }}
-                />
-                <Text
-                numberOfLines={2}
-                  style={{
-                    color: "black",
-                    fontSize: 18,
-                    fontWeight: "500",
-                    width: 100
-                  }}
-                >
-                  {item.name}
-                </Text>
-                <Text
-                  style={{
-                    color: "black",
-                    fontSize: 18,
-                    fontWeight: "500",
-                    
-                  }}
-                >
-                  PKR {item.price}
-                </Text>
+                
+                <View style={{flexDirection: 'row',alignItems: 'flex-end', marginRight: 5,  marginTop: 10, 
+    justifyContent: 'flex-end'}}>
                 <TouchableOpacity
                   onPress={() => {
                     removeFromList(item)
                     
                   }}
                 >
-                    <Image
-                      style={{
-                        width: 24,
-                        height: 24,
-                      }}
-                      source={require("../../assets/imgs/new-blackish-cross.png")}
-                    />
+                <Ionicons  onPress={()=>{
+  removeFromList(item)
+}}  name="close-outline" size={30} color={appColors.darkGrey} />
                   </TouchableOpacity>
+</View>
+
+                  <View style={{flexDirection: "row",alignItems: "center", justifyContent: 'space-between', marginLeft: 20, marginBottom: 35}}>
+                <Image
+                  source={{
+                    uri: "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005" + item.image
+                  }}
+                  style={{
+                    width: 120,
+                    height: 100,
+                  }}
+                />
+                <View style={{alignItems: "center", justifyContent: 'center'}}>
+                <Text
+                  style={{
+                    color: "black",
+                    fontSize: 16,
+                    fontWeight: "600",
+                    width: 100
+                  }}
+                >
+                  {item.name}
+                </Text>
+                </View>
+                <View style={{alignItems: "center", justifyContent: 'center'}}>
+                <Text
+                  style={{
+                    color: "black",
+                    fontSize: 16,
+                    fontWeight: "600",marginRight: 20
+                    
+                  }}
+                >
+                  PKR {item.price}
+                </Text>
+                </View>
+                </View>
                 </View>
               );
             })}
@@ -691,7 +709,7 @@ async function getRestaurantsAndCategoriesFunc(){
                     return (
                       <AppResturantsCard
                         key={index}
-                        id={individualProduct.id}
+                        id={individualProduct.restaurant_id}
                         name={individualProduct.name}
                         image={individualProduct.image}
                         // amount={individualProduct.product.amount}

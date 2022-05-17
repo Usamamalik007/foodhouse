@@ -5,6 +5,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
 import {previousThursday} from 'date-fns';
+import { appColors } from "../../src/utils/colors";
 
 interface IAppCatalogue {
   cartItemID: number;
@@ -13,6 +14,7 @@ interface IAppCatalogue {
   productName: string;
   productPrice: number;
   productImage: string;
+  removeItem: (cart_id: number, food_item_id: number) => Promise<void>;
 }
 
 export default function AppCounterItem({
@@ -27,39 +29,39 @@ export default function AppCounterItem({
   const navigation = useNavigation<any>();
   const [quantityCounter, setQuantityCounter] = useState(quantity);
   return (
+    
     <View>
       <View style={innerStyles.catalogueCard}>
+      <View style={{flexDirection: 'row',alignItems: 'flex-end',
+    justifyContent: 'flex-end'}}>
+      <Ionicons  onPress={()=>{
+  removeItem(cartItemID, productID)
+}}  name="close-outline" size={30} color={appColors.darkGrey} />
+</View>
+      <View style={{flexDirection: 'row',alignItems: 'center',
+    justifyContent: 'flex-start'}}>
         <FastImage
           source={{uri: productImage}}
           style={innerStyles.image}
           resizeMode={'contain'}
         />
-
-        <View style={{flexDirection: 'column', marginRight: 150}}>
-          <Text style={[innerStyles.text, {marginTop: 10}]}>{productName}</Text>
-          <Text style={[innerStyles.text, {marginTop: 10}]}>Quantity: {quantity}</Text>
-          <Text style={[innerStyles.text, {marginTop: 10}]}>
-           Price per item: PKR {productPrice}
+          <Text style={[innerStyles.normalText, {padding: 15}]} >{productName} x {quantity}</Text>
+          <Text style={[innerStyles.normalText, {padding: 15}]} >
+           PKR {productPrice*quantity}
           </Text>
-        </View>
-
-<TouchableOpacity onPress={()=>{
-  removeItem(cartItemID, productID)
-}} style={{marginTop: 30}}><Text>Remove</Text></TouchableOpacity>
+          </View>
       </View>
+
     </View>
   );
 }
 
 const innerStyles = StyleSheet.create({
   catalogueCard: {
-    flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     marginTop: 8,
     marginBottom: 8,
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
   },
   image: {
     height: 88,
@@ -78,5 +80,10 @@ const innerStyles = StyleSheet.create({
     fontFamily: 'Gotham',
     fontSize: 16,
     fontWeight: '500',
+  },
+  normalText: {
+    color: '#070A0D',
+    fontSize: 15,
+    marginVertical: 3,
   },
 });

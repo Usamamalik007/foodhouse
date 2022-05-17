@@ -8,29 +8,31 @@ import {yupResolver} from '@hookform/resolvers/yup';
 // import CalendarIcon from '../assets/imgs/calender.svg';
 import {AppTextInput} from './AppTextInput';
 import {AppButton} from './AppButton';
-import {useAddAddress} from '../hooks/User/Address/useAddAddress';
 import {SnackbarError, SnackbarSuccess} from '../utils/SnackBar';
 import {useDispatch} from 'react-redux';
-import {useUpdateProfile} from '../hooks/User/Profile/useUpdateProfile';
 import { useAppSelector } from "../store/hooks";
 let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
 
 const schema = yup.object().shape({
-  fname: yup
+   owner: yup
     .string()
-    .required('Please enter your First Name')
-    .min(3, 'First Name should be 3 character long'),
-  lname: yup
+    .required('Please enter your name')
+    .min(3, 'Name should be at least 3 characters long'),
+    name: yup
     .string()
-    .required('Please enter your Last Name')
-    .min(3, 'Last Name should be 3 character long'),
+    .required('Please enter your restaurant name')
+    .min(3, 'Restaurant name should be at least 3 characters long'),
+  address: yup
+    .string()
+    .required('Please enter your address')
+    .min(8, 'Address should be at least 8 characters long'),
   mobileno: yup
     .string()
     .required('Please enter your Phone Number')
-    .min(8, 'Phone Number should be 8 character long')
+    .min(8, 'Phone Number should be at least 8 character long')
 });
 
-function AppUserBasicProfile(props: any) {
+function AppRestaurantBasicProfile(props: any) {
   const {
     control,
     handleSubmit,
@@ -39,16 +41,13 @@ function AppUserBasicProfile(props: any) {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      fname: props?.route?.params?.fname,
-      lname: props?.route?.params?.lname,
-      mobileno: props?.route?.params?.mobileno,
+      owner: props?.route?.params?.owner,
+      name: props?.route?.params?.name,
+      address: props?.route?.params?.address,
+      mobileno: props?.route?.params?.mobileno
     },
   });
 
-  const userData = props?.route?.params;
-  console.log("=======================================AppUserBasicProfile", userData)
-  console.log("=======================================props", props?.route?.params)
-  const navigation = useNavigation<any>();
   let userState: any = useAppSelector((state) => state?.user);
 
   if (typeof userState.user != "object") {
@@ -56,20 +55,23 @@ function AppUserBasicProfile(props: any) {
   } else {
     userState = userState.user;
   }
+  const userData = props?.route?.params;
+  console.log("=======================================AppRestaurantBasicProfile", userData)
+  const navigation = useNavigation<any>();
 
- 
   const onSubmit = handleSubmit( async (values) =>{
     console.log("Hello world")
     try {
         let requestBody = {
-            fname: values.fname,
-            lname: values.lname,
+            name: values.name,
+            owner: values.owner,
+            address: values.address,
             mobileno: values.mobileno,
             password: props?.route?.params?.password
         }
         console.log("requestBody", requestBody);
         // let response: any  = {};
-        let response: any = await fetch(base_url + "/updateUser",{
+        let response: any = await fetch(base_url + "/updateRestaurant",{
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -82,7 +84,7 @@ function AppUserBasicProfile(props: any) {
         // tempList = JSON.parse(JSON.stringify(categoriesAndRestaurants))
         console.log("--------------------------------------------------------------response",response)
         SnackbarSuccess(response?.message);
-        navigation.navigate("ProfileScreen");
+        navigation.navigate('ProfileScreen')
       } else {
         console.log(JSON.stringify(response))
         SnackbarError(response?.message);
@@ -93,49 +95,39 @@ function AppUserBasicProfile(props: any) {
       }
   });
 
-  const updateProfileRequest = useUpdateProfile({
-    async onSuccess(res) {
-      // navigation.navigate('ProfileScreen');
-      SnackbarSuccess('Successfully Updated');
-      reset();
-    },
-    onError(err) {
-      SnackbarError(err.message);
-    },
-  });
 
   return (
     <View style={innerStyles.main_container}>
       <View style={innerStyles.loginContainer}>
         <View style={innerStyles.input_Container}>
           <AppTextInput
-            name="fname"
+            name="owner"
             outerViewProps={{style: {height: 45}}}
             control={control}
             textInputProps={{
-              placeholder: 'First Name',
+              placeholder: 'Owner',
               style: {fontSize: 14, color: 'black', backgroundColor: 'white'},
             }}
           />
-          {errors.fname && (
+          {errors.owner && (
             <Text style={innerStyles.errorField}>
-              {errors.fname['message']}
+              {errors.owner['message']}
             </Text>
           )}
 
           <AppTextInput
-            name="lname"
+            name="name"
             outerViewProps={{style: {height: 45}}}
             control={control}
             textInputProps={{
-              placeholder: 'Last Name',
+              placeholder: 'Name',
               style: {fontSize: 14, color: 'black', backgroundColor: 'white'},
             }}
           />
 
-          {errors.lname && (
+          {errors.name && (
             <Text style={innerStyles.errorField}>
-              {errors.lname['message']}
+              {errors.name['message']}
             </Text>
           )}
 
@@ -157,12 +149,27 @@ function AppUserBasicProfile(props: any) {
             </Text>
           )} */}
 
+        <AppTextInput
+            name="address"
+            outerViewProps={{style: {height: 45}}}
+            control={control}
+            textInputProps={{
+              placeholder: 'Address',
+              style: {fontSize: 14, color: 'black', backgroundColor: 'white'},
+            }}
+          />
+
+          {errors.address && (
+            <Text style={[innerStyles.errorField, {marginBottom: 5}]}>
+              {errors.address['message']}
+            </Text>
+          )}
           <AppTextInput
             name="mobileno"
             outerViewProps={{style: {height: 45}}}
             control={control}
             textInputProps={{
-              placeholder: 'Phone Number',
+              placeholder: 'Mobile Number',
               keyboardType: 'numeric',
               style: {fontSize: 14, color: 'black', backgroundColor: 'white'},
             }}
@@ -216,7 +223,7 @@ function AppUserBasicProfile(props: any) {
   );
 }
 
-export default AppUserBasicProfile;
+export default AppRestaurantBasicProfile;
 
 const innerStyles = StyleSheet.create({
   main_container: {

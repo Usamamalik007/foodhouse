@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState} from 'react';
 
 import {StyleSheet, Text, View, TextInput} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -13,13 +13,15 @@ import AppFavourite from '../../component/AppFavourite';
 import AppAddToCart from '../../component/AppAddToCart';
 
 function ProductDetailScreen(props: any) {
-  const product = props.route.params.productData;
+  console.log(props)
+  const product = props.route.params.props;
  
   const [quantity, setQuantity]= useState(0);
 
 
   console.log('rpduct', product);
   console.log(quantity)
+
 
   return (
     <View style={[innerStyles.mainContainer]}>
@@ -34,12 +36,11 @@ function ProductDetailScreen(props: any) {
           <AppFavourite />
         </View>
         <Text style={innerStyles.currentPrice}>PKR {product.amount}</Text>
-        <Text style={innerStyles.productName}>Quantity</Text>
+        <Text style={innerStyles.productName}>Select amount</Text>
         <TextInput 
    style={{borderWidth: 1}}
    keyboardType='numeric'
-   onChangeText={(text)=> {setQuantity(text)}}
-  //  value={quantity}
+   onChangeText={(text: any)=> {setQuantity(text)}}
    maxLength={10}  //setting limit of input
 />
         {/* <AppColor tittleSize={20} colorSize={23} fontWeight={'700'} />
@@ -74,7 +75,7 @@ function ProductDetailScreen(props: any) {
           title={'Add to cart'}
           productID={product.id.toString()}
           restaurantId={product.restaurantId}
-          navigationScreen={'CartScreen'}
+          navigationScreen={'HomeMenus'}
           quantity={quantity}
         />
       </ScrollView>
@@ -127,15 +128,7 @@ const innerStyles = StyleSheet.create({
   },
   descriptionContainer: {
     marginVertical: 10,
-    borderWidth: 2,
-    backgroundColor: 'white',
-    borderColor: '#FAF9F6',
-    shadowColor: '#E2DFD2',
-    shadowOpacity: 0.9,
-    elevation: 5,
-    borderRadius: 8,
     paddingVertical: 10,
-    paddingHorizontal: 15,
   },
   descriptionTittle: {
     fontWeight: '500',

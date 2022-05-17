@@ -93,7 +93,7 @@ export default function ItemScreen(props: any) {
           }}>
           {!getProductByCategoryList.isLoading &&
             getProductByCategoryList?.data?.product?.map(
-              (individualProduct: Product, index: number) => {
+              (individualProduct: any, index: number) => {
                 return (
                   <AppProductCard
                     key={index}

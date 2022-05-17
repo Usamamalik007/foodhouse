@@ -6,36 +6,38 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  AsyncStorage,
   StyleSheet,
   Alert,
   Image,
 } from "react-native";
 import { SnackbarSuccess, SnackbarError } from "../../utils/SnackBar";
+import styles from '../../assets/css/style';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { appColors } from "../../../src/utils/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import AppAddToCart from "../../component/AppAddToCart";
 import AppCounterItem from "../../component/AppCounterItem";
 import AppTextTitle from "../../component/AppTextTitle";
 import { useGetCartRequest } from "../../hooks/Cart/useProductToCart";
 import { ICartDataResponse } from "../../interfaces/ICartData";
 import { userKey, loadUserFromStorage } from "../../store/userSlice";
-import { useRoute } from '@react-navigation/native';
 import { useAppSelector } from "../../store/hooks";
 import Moment from "moment";
+import { white } from "react-native-paper/lib/typescript/styles/colors";
 
 
 const orders: any = [];
 export default function CartScreen() {
   // let cartItemList = useGetCartRequest<ICartDataResponse>().data;
-  const router = useRoute();
-  const { params } = router;
-  const restaurant_id = params?.restaurant_id
   const navigation = useNavigation<any>();
 
-  const [cartItemList, setCartItemList] = useState([]);
+  const [cartItemList, setCartItemList] = useState<any>([]);
   const [orderList, setOrderList] = useState(orders);
   useEffect(()=>{
     getData()
-    },[])
+    getCartItemList();
+  },[])
     
      function getData(){
       AsyncStorage.getItem(userKey, (err, result) => {
@@ -98,10 +100,6 @@ export default function CartScreen() {
     isRestaurantOrderScreen = true;
   }
 
-  useEffect(() => {
-    // Update the document title using the browser API
-    getCartItemList();
-  }, []);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -168,13 +166,9 @@ export default function CartScreen() {
   async function addOrder(user_id: number) {
     let form_data = {
       user_id: user_id,
-      restaurant_id: restaurant_id,
     };
 
     console.log(form_data);
-    console.log(restaurant_id);
-    console.log(router.params);
-    console.log(router);
 
     try {
       let response: any = await fetch(
@@ -192,7 +186,7 @@ export default function CartScreen() {
       response = await response.json();
       console.log("response is", JSON.stringify(response));
       if (response.statusCode === 200) {
-        // navigation.navigate('HomeScreen');
+        navigation.navigate('HomeScreen');
         SnackbarSuccess(response.message);
       } else {
         SnackbarError(response.message);
@@ -282,160 +276,56 @@ export default function CartScreen() {
             style={{
               fontSize: 20,
               fontWeight: "500",
-              color: "black",
             }}
           >
             Orders
           </Text>
-          {/* <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                color: "black",
-                fontSize: 18,
-                fontWeight: "500",
-              }}
-            >
-              Restaurant
-            </Text>
-            <Text
-              style={{
-                color: "black",
-                fontSize: 18,
-                fontWeight: "500",
-              }}
-            >
-              Status
-            </Text>
-            <Text
-              style={{
-                color: "black",
-                fontSize: 18,
-                fontWeight: "500",
-              }}
-            >
-              Time
-            </Text>
-          </View> */}
-          {orderList.map((order: any) => {
+          {orderList?.length > 0 ? (
+          orderList?.map((order: any) => {
             return (
-              <View
-                style={{
-                  marginTop: 20,
-                }}
-              >
-                <View
-                  style={{
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexDirection: "row",
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "black",
-                      fontSize: 18,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {order.restaurant_name}
-                  </Text>
-                 <View style={{
-                   backgroundColor: 'blue',
-                   height: 35,
-                   borderRadius: 17.5,
-                   justifyContent: 'center',
-                   alignItems: 'center',
-                   width: 120
-                 }}>
-                 <Text
-                    style={{
-                      color: "white",
-                      fontSize: 18,
-                      fontWeight: "500",
-                      
-                    }}
-                  >
-                    {order.status}
-                  </Text>
-                 </View>
+              <View  style={innerStyles.orderDetailContainer}>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={innerStyles.boldText}>Order Numbers:</Text>
+                  <Text style={innerStyles.normalText}>{order.order_id}</Text>
                 </View>
-                <View
-                  style={{
-                    marginTop: 10,
-                    justifyContent: "space-between",
-                    flexDirection: "row",
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "grey",
-                      fontSize: 14,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {Moment(order.created_at).format(" hh:mm DD-MMM-YY")}
-                  </Text>
-                  {
-                    order.status === "Pending" && <View style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      width: 200
-                    }}>
-                       <TouchableOpacity onPress={() => {
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={innerStyles.boldText}>Order Date:</Text>
+                  <Text style={innerStyles.normalText}> {Moment(order.created_at).format("DD-MM-YYYY hh:mm:ss")}</Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                <Text style={innerStyles.boldText}>Order Status:</Text>
+                <Text style={[innerStyles.normalText, {
+                color: order.status == "Rejected" ? "#d12d36" : order.status == "Pending" ? "#24a0ed" : "#429b44"
+                }]}>{order.status}</Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={innerStyles.boldText}>Customer Name:</Text>
+                  <Text style={innerStyles.normalText}> {order.customer_name}</Text>
+                </View>
+                {order.status == "Pending" && <View style={{flexDirection: 'row', marginTop: 15}}>
+
+                <TouchableOpacity style={{alignItems: "flex-start", width: 35, left: 80, borderRadius: 5, borderWidth: 1, borderColor: "lightgrey", backgroundColor: "#429b44"}} onPress={() => {
                       updateOrderStatus(order, true);
                       console.log("------------------------",order)
                     }}>
-                      <Image
-                        style={{
-                          height: 24,
-                          width: 24,
-                          marginLeft: 90,
-                        }}
-                        source={require("../../assets/imgs/new_blue_tick_icon.png")}
-                      />
+                    <Ionicons  name="checkmark-outline" size={30} color={appColors.white} />
                     </TouchableOpacity>
-                     <TouchableOpacity onPress={() => {
+                     <TouchableOpacity style={{alignItems: "flex-end",width: 35, marginLeft: 120, borderRadius: 5, borderColor: "lightgrey", borderWidth: 1, backgroundColor: "#24a0ed"}}  onPress={() => {
                       updateOrderStatus(order, false);
                       console.log("------------------------",order)
                     }}>
-                      <Image
-                        style={{
-                          height: 24,
-                          width: 24,
-                        }}
-                        source={require("../../assets/imgs/new-blackish-cross.png")}
-                      />
+                <Ionicons  name="close-outline" size={30} color={appColors.white} />
                     </TouchableOpacity>
                     </View>
-                  }
-                 
-                </View>
+          }
+                
               </View>
             );
-          })}
+          })
+        ) : (
+          <Text style={innerStyles.trackText}>No Order in List</Text>
+        )}
         </ScrollView>
-        {/* <View
-          style={{
-            bottom: 0,
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            padding: 10,
-          }}>
-          <TouchableOpacity
-            style={innerStyles.cartContainer}
-            onPress={() => {
-              navigation.navigate('CheckoutScreen', cartItemList?.response);
-            }}>
-            <Text style={innerStyles.addToCartText}>Check Out</Text>
-          </TouchableOpacity>
-        </View> */}
       </SafeAreaView>
     );
   }
@@ -449,33 +339,9 @@ export default function CartScreen() {
       }}
     >
       <ScrollView>
-        <AppTextTitle title="Cart" />
-
-        <TouchableOpacity
-          onPress={() => {
-            clearCart();
-          }}
-          style={{
-            borderWidth: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text>Clear Cart</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-        onPress={() => {
-          addOrder(userState?.customer?.user_id);
-        }}
-          style={{
-            borderWidth: 1,
-            marginTop: 30,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text>Confirm Order</Text>
-        </TouchableOpacity>
+        <View style={innerStyles.titleContainer}>
+          <AppTextTitle title={'Cart'} />
+        </View>
         {cartItemList &&
           cartItemList.data &&
           cartItemList.data.length > 0 &&
@@ -496,27 +362,71 @@ export default function CartScreen() {
               />
             );
           })}
-      </ScrollView>
-      {/* <View
-        style={{
-          bottom: 0,
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          padding: 10,
-        }}>
-        <TouchableOpacity
-          style={innerStyles.cartContainer}
-          onPress={() => {
-            navigation.navigate('CheckoutScreen', cartItemList?.response);
+          
+        {cartItemList &&
+          cartItemList.data &&
+          cartItemList.data.length > 0 ? (
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            
           }}>
-          <Text style={innerStyles.addToCartText}>Check Out</Text>
+          <TouchableOpacity
+          onPress={() => {
+            clearCart();
+          }}
+          style={[
+            styles.p10,
+            styles.br10,
+            styles.mt10,
+            styles.shadow,
+            {
+              marginLeft: 5,
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              backgroundColor: '#f44336'
+            },
+          ]}
+        >
+          <Text style={{
+            color: "white"
+          }}>Clear Cart</Text>
         </TouchableOpacity>
-      </View> */}
+        <TouchableOpacity
+        onPress={() => {
+          addOrder(userState?.customer?.user_id);
+        }}
+          
+        style={[
+          styles.p10,
+          styles.br10,
+          styles.mt10,
+          styles.shadow,
+          {
+            marginLeft: 5,
+            justifyContent: 'flex-end',
+            alignItems: 'flex-end',
+            backgroundColor: '#429b44'
+          },
+        ]}
+        >
+          <Text style={{
+            color: "white"
+          }}>Confirm Order</Text>
+        </TouchableOpacity>
+        </View>
+        ) : (
+          <Text style={innerStyles.trackText}>No item in cart</Text>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }
 const innerStyles = StyleSheet.create({
+  titleContainer: {
+    marginLeft: 20,
+  },
   cartContainer: {
     justifyContent: "center",
     alignItems: "center",
@@ -533,4 +443,31 @@ const innerStyles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
+  orderDetailContainer: {
+    flexDirection: 'column',
+    padding: 17,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: '#FAF9F6',
+    shadowColor: '#E2DFD2',
+    shadowOpacity: 0.9,
+    marginHorizontal: 15,
+    borderRadius: 8,
+  },
+  boldText: {
+    fontSize: 14,
+    fontWeight: '400',
+    marginVertical: 3,
+    marginRight: 3,
+  },
+  normalText: {
+    fontSize: 14,
+    marginVertical: 3,
+  },
+  trackText: {
+    fontSize: 18,
+    marginTop: 20,
+    textAlign: 'center',
+    fontWeight: '600',
+  }
 });

@@ -7,13 +7,13 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
-  AsyncStorage,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useForm } from "react-hook-form";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
@@ -32,23 +32,17 @@ import { useGetProfile } from "../../hooks/User/Profile/useGetProfile";
 
 import ImagePicker from "react-native-image-crop-picker";
 import { sleep } from "react-query/types/core/utils";
-const profileList = [
-  {
-    id: 1,
-    name: "Payment Information",
-    image: require("../../assets/imgs/paymentInformation.png"),
-  },
+let profileList = [
+ 
   {
     id: 2,
     name: "Orders",
-    image: require("../../assets/imgs/order.png"),
-    value: "0",
+    image: require("../../assets/imgs/order.png")
   },
   {
     id: 3,
     name: "Favourites",
     image: require("../../assets/imgs/favourite.png"),
-    value: "2",
   },
   {
     id: 4,
@@ -82,9 +76,46 @@ export default function ProfileScreen() {
 
   if (userState?.customer?.role == 1) {
     isRestaurantMenuScreen = true;
+    profileList=[
+      {
+        id: 4,
+        name: "Edit Profile",
+        image: require("../../assets/imgs/user.png"),
+      },
+      {
+        id: 5,
+        name: "Log Out",
+        image: require("../../assets/imgs/logout.png"),
+      },
+    ]
+  } else{
+    profileList = [
+ 
+      {
+        id: 2,
+        name: "Orders",
+        image: require("../../assets/imgs/order.png")
+      },
+      {
+        id: 3,
+        name: "Favourites",
+        image: require("../../assets/imgs/favourite.png"),
+      },
+      {
+        id: 4,
+        name: "Edit Profile",
+        image: require("../../assets/imgs/user.png"),
+      },
+      {
+        id: 5,
+        name: "Log Out",
+        image: require("../../assets/imgs/logout.png"),
+      },
+    ];
   }
 
   console.log("userState in profiles2", userState)
+  console.log("profileList in profiles2", profileList)
 
   
   let userData: any;
@@ -117,14 +148,13 @@ export default function ProfileScreen() {
   async function fetchData() {
 
     console.log(getProfile?.data?.data[0])
-    setImagePath(base_url + getProfile?.data?.data[0]?.image);
+    setImagePath(getProfile?.data?.data[0]?.image);
   }
 
 
 
   const navigation = useNavigation<any>();
   const [openOrderModal, setOpenOrderModal] = useState<boolean>(false);
-  const [openPaymentModal, setOpenPaymentModal] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
 
   const {
@@ -138,23 +168,25 @@ export default function ProfileScreen() {
   });
 
   const changeValue = (id: number) => {
-    if (id == 1) {
-      // setOpenPaymentModal(!openPaymentModal);
-    } else if (id == 2) {
+   if (id == 2) {
       // setOpenOrderModal(!openOrderModal);
-      setOpenPaymentModal(!openPaymentModal);
       navigation.navigate("OrderScreen");
     } else if (id == 3) {
       // setOpenOrderModal(!openOrderModal);
-      setOpenPaymentModal(!openPaymentModal);
       navigation.navigate("FavouritesScreen");
     } else if (id == 4) {
       // setOpenOrderModal(!openOrderModal);
-      setOpenPaymentModal(!openPaymentModal);
-      navigation.navigate(
-        "AppUserBasicProfile",
-        getProfile?.data?.data[0]
-      );
+      if(getProfile?.data?.data[0]?.role===0){
+        navigation.navigate(
+          "AppUserBasicProfile",
+          getProfile?.data?.data[0]
+        );
+      } else{
+        navigation.navigate(
+          "AppRestaurantBasicProfile",
+          getProfile?.data?.data[0]
+        );
+      }
     } else if (id == 5) {
       dispatch(logOutUser());
     }
@@ -208,8 +240,8 @@ export default function ProfileScreen() {
       uri: image_Path,
       name: "image.jpg",
       type: "image/jpg",
-      user_id: userState?.customer?.id
     });
+    form_data.append("user_id", userState?.customer?.id)
 
     console.log("form_data", JSON.stringify(form_data));
     try {
@@ -239,61 +271,9 @@ export default function ProfileScreen() {
   const no_photo_url =
     "http://panionprodupdated-env.eba-4pmuehik.eu-central-1.elasticbeanstalk.com";
 
-    if (isRestaurantMenuScreen){
-    return (
-      <SafeAreaView>
- <Text>Profile Menu for restaurant mananger</Text>
- <View style={innerStyles.mainProfileCover}>
-        <TouchableOpacity
-          style={{}}
-          onPress={() => {
-            openImagePicker();
-          }}
-        >
-          <Image
-            source={{
-              uri:
-                imagePath && imagePath.length > 0
-                  ? imagePath
-                  : "https://cdn1.vectorstock.com/i/thumb-large/22/05/male-profile-picture-vector-1862205.jpg",
-            }}
-            style={innerStyles.image}
-            resizeMode={"cover"}
-          />
-          <Image
-            style={{
-              height: 24,
-              width: 24,
-              marginTop: -50,
-              marginLeft: 60,
-            }}
-            source={require("../../assets/imgs/blue-edit-pen.png")}
-          />
-        </TouchableOpacity>
-        <View style={{ marginTop: 30, marginRight: 30, width: "35%" }}>
-          <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
-            {getProfile?.data?.data[0]?.fname}
-            {" "}
-            {getProfile?.data?.data[0]?.lname}
-          </Text>
-          <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
-           {getProfile?.data?.data[0]?.mobileno}
-          </Text>
-        </View>
-      </View>
-
- <TouchableOpacity>
-   <Text onPress={()=>{
-      dispatch(logOutUser());
-   }}>Log out</Text>
- </TouchableOpacity>
-    </SafeAreaView>
-
-    )
-    }
   return (
     <SafeAreaView>
-      <View style={innerStyles.mainProfileCover}>
+      <View style={innerStyles.mainContainer}>
         <TouchableOpacity
           style={{}}
           onPress={() => {
@@ -304,7 +284,7 @@ export default function ProfileScreen() {
             source={{
               uri:
                 imagePath && imagePath.length > 0
-                  ? imagePath
+                  ? base_url + imagePath
                   : "https://cdn1.vectorstock.com/i/thumb-large/22/05/male-profile-picture-vector-1862205.jpg",
             }}
             style={innerStyles.image}
@@ -314,19 +294,19 @@ export default function ProfileScreen() {
             style={{
               height: 24,
               width: 24,
-              marginTop: -50,
-              marginLeft: 60,
+              marginTop: -40,
+              marginLeft: 40,
             }}
             source={require("../../assets/imgs/blue-edit-pen.png")}
           />
         </TouchableOpacity>
-        <View style={{ marginTop: 30, marginRight: 30, width: "35%" }}>
-          <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
+        <View style={{ marginTop: 5, marginRight: 60, width: "60%" }}>
+          <Text style={(style.ffbl, { fontSize: 18, fontWeight: "500" })}>
             {getProfile?.data?.data[0]?.fname}
             {" "}
             {getProfile?.data?.data[0]?.lname}
           </Text>
-          <Text style={(style.ffbl, { fontSize: 19, fontWeight: "500" })}>
+          <Text style={(style.ffbl, { fontSize: 18, fontWeight: "500" })}>
            {getProfile?.data?.data[0]?.mobileno}
           </Text>
         </View>
@@ -352,11 +332,23 @@ const innerStyles = StyleSheet.create({
     height: 110,
     backgroundColor: appColors.white,
   },
+  mainContainer: {
+    width: '95%',
+    backgroundColor: appColors.white,
+    elevation: 5,
+    marginVertical: 8,
+    marginHorizontal: 8,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   image: {
-    height: 70,
-    width: 70,
+    height: 60,
+    width: 60,
     borderRadius: 35,
-    margin: 20,
+    marginLeft: 10,
   },
   editImage: {
     height: 55,

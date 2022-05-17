@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from "react";
 import {View, Text, SafeAreaView, ScrollView, Alert} from 'react-native';
 
 import AppProductCard from '../../component/AppProductCard';
 import AppTextTitle from '../../component/AppTextTitle';
+import { SnackbarSuccess, SnackbarError } from "../../utils/SnackBar";
 import {useGetAllFavourites} from '../../hooks/Favourites/UseGetFavourites';
 import {
   Wishlist,
@@ -12,6 +13,7 @@ import {
 import {useAppSelector} from '../../store/hooks';
 
 export default function FavouritesScreen() {
+  let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
 
 
   let userState: any = useAppSelector((state) => state?.user);
@@ -35,16 +37,39 @@ export default function FavouritesScreen() {
     isScreenNotAvailable = true
     
   }
+  const [allFavouriteList, setAllFavouriteList] = useState<any>();
 
   useEffect(() => {
-    
+    getAllFavourites()
 }, []);
-  const allfavouriteList: any = useGetAllFavourites<WishListResponse>(
-    userData?.user?.id,
-  );
- 
+async function getAllFavourites(){
+  let response:any = await fetch(base_url + "/getFavourites", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:
+        "Bearer " + userState.token, 
+    }
+  })
+  response = await response.json()
+  if (response.statusCode === 200) {
+    setAllFavouriteList(response)
+    console.log("===========================", allFavouriteList)  
+    SnackbarSuccess(response.message);
+  } else {
+    console.log(JSON.stringify(response))
+    SnackbarError(response.message);
+  }
+ }
+
+  // const allfavouriteList: any = useGetAllFavourites<WishListResponse>(
+  //   userData?.user?.id,
+  // );
+  async function selectFavourite(){
+    getAllFavourites()
+  }
   console.log('==============allfavouriteList======================');
-  console.log(JSON.stringify(allfavouriteList));
+  console.log(JSON.stringify(allFavouriteList));
   console.log('==============allfavouriteList======================');
   if (isScreenNotAvailable){
     return(
@@ -57,8 +82,8 @@ export default function FavouritesScreen() {
     )
   }
   return (
+    <ScrollView>
     <SafeAreaView style={{flex: 1, paddingLeft: 15, paddingRight: 15}}>
-      <ScrollView>
         <AppTextTitle title="Favourites" />
         <View
           style={{
@@ -66,9 +91,9 @@ export default function FavouritesScreen() {
             flexWrap: 'wrap',
             justifyContent: 'space-between',
           }}>
-          {allfavouriteList?.data?.data?.length > 0 ? (
-            allfavouriteList?.data?.data &&
-            allfavouriteList?.data?.data?.map(
+          {allFavouriteList?.data?.length > 0 ? (
+            allFavouriteList?.data &&
+            allFavouriteList?.data?.map(
               (individualProduct: any, index: any) => {
                 return (
                   <AppProductCard
@@ -78,6 +103,7 @@ export default function FavouritesScreen() {
                     amount={individualProduct?.price}
                     image={individualProduct?.image}
                     is_wishlist={true}
+                    selectFavourite = {selectFavourite}
                   />
                 );
               },
@@ -91,7 +117,7 @@ export default function FavouritesScreen() {
             </View>
           )}
         </View>
-      </ScrollView>
     </SafeAreaView>
+    </ScrollView>
   );
 }

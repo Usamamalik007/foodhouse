@@ -6,7 +6,7 @@ export interface Product {
   key: string;
   amount?: string;
   restaurantId? : string;
-  is_wishlist:boolean
+  is_wishlist:boolean;
 }
 
 

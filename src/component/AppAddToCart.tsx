@@ -26,9 +26,7 @@ function AppAddToCart(props: any) {
       });
     } else {
       if (props.navigationScreen) {
-        navigation.navigate(props.navigationScreen, {
-          restaurant_id: props.restaurantId
-        });
+        navigation.navigate(props.navigationScreen, {id: props.restaurantId});
       }
     }
   };
@@ -39,17 +37,13 @@ function AppAddToCart(props: any) {
       if (res.statusCode == 200){
         SnackbarSuccess(res.message);
         if (props.navigationScreen) {
-          navigation.navigate(props.navigationScreen,{
-            restaurant_id: props.restaurantId
-          });
+          navigation.navigate(props.navigationScreen, {id: props.restaurantId});
         }
       }
       else{
         SnackbarError(res.message);
         if (props.navigationScreen) {
-          navigation.navigate(props.navigationScreen,{
-            restaurant_id: props.restaurantId
-          });
+          navigation.navigate(props.navigationScreen, {id: props.restaurantId});
         }
 
       }

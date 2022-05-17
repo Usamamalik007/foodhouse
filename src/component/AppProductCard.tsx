@@ -7,7 +7,6 @@ import styles from '../assets/css/style';
 import FastImage from 'react-native-fast-image';
 import {useForm} from 'react-hook-form';
 
-import {Product} from '../interfaces/IProductData';
 import {useAddFavourite} from '../hooks/Favourites/useAddFavourite';
 import {IAddFavouriteRequest} from '../interfaces/IFavouriteData';
 import {useAppSelector} from '../store/hooks';
@@ -15,34 +14,34 @@ import {useRemoveFavourite} from '../hooks/Favourites/useRemoveFavourite';
 import {SnackbarSuccess} from '../utils/SnackBar';
 import {CalculatePercentage} from '../utils/CalculatePercentage';
 
-function AppProductCard(productData: Product) {
+function AppProductCard(props: any) {
+  console.log("=================================================props", props)
   const {
     control,
     handleSubmit,
     formState: {errors},
   } = useForm();
   console.log(
-    `productData?.is_wishlist onSubmitFavourite`,
-    productData?.is_wishlist, productData.image
+    `props?.is_wishlist onSubmitFavourite`,
+    props?.is_wishlist, props?.image
   );
   const navigation = useNavigation<any>();
-  const [favourite, setFavourite] = useState<boolean>(true);
 
   const onSubmitFavourite = handleSubmit(() => {
-    console.log(`productData?.is_wishlist`, productData?.is_wishlist);
-    if (productData?.is_wishlist == false) {
+    console.log(`props?.is_wishlist`, props?.is_wishlist);
+    if (props?.is_wishlist == false) {
       addFavourite.mutate({
-        food_item_id: productData?.id.toString(),
+        food_item_id: props?.id.toString(),
       });
-    } else if (productData?.is_wishlist == true) {
+    } else if (props?.is_wishlist == true) {
       removeFavourite.mutate({
-        food_item_id: productData?.id,
+        food_item_id: props?.id,
       });
     }
   });
   const addFavourite = useAddFavourite({
     onSuccess() {
-      setFavourite(!favourite);
+      props.selectFavourite()
       SnackbarSuccess('Successfully Added');
     },
     onError() {},
@@ -50,7 +49,7 @@ function AppProductCard(productData: Product) {
 
   const removeFavourite = useRemoveFavourite({
     onSuccess() {
-      setFavourite(!favourite);
+      props.selectFavourite()
     },
     onError() {},
   });
@@ -61,7 +60,7 @@ function AppProductCard(productData: Product) {
         <View style={innerStyles.submainContainer}>
           
           <FastImage
-            source={{uri: "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005" + productData.image}}
+            source={{uri: "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005" + props.image}}
             style={innerStyles.image}
             resizeMode={'cover'}
           />
@@ -72,10 +71,10 @@ function AppProductCard(productData: Product) {
             >
               <Ionicons
                 name={
-                  productData.is_wishlist == true ? 'heart' : 'heart-outline'
+                  props.is_wishlist == true ? 'heart' : 'heart-outline'
                 }
                 size={25}
-                color={productData.is_wishlist == true ? '#CE3E3E' : '#373737' }
+                color={props.is_wishlist == true ? '#CE3E3E' : '#373737' }
               />
             </TouchableOpacity>
           </View>
@@ -84,10 +83,10 @@ function AppProductCard(productData: Product) {
           style={innerStyles.productDetailContainer}
           onPress={() =>
             navigation.navigate('ProductDetailScreen', {
-              productData: productData,
+              props: props,
             })
           }>
-          <Text style={innerStyles.productName}>{productData.name}</Text>
+          <Text style={innerStyles.productName}>{props.name}</Text>
 
 
         </TouchableOpacity>

@@ -79,8 +79,10 @@ function AppResturantsCard(productData: any) {
         </View>
         <TouchableOpacity
           style={innerStyles.productDetailContainer}
-          onPress={() =>
-            navigation.navigate('HomeMenus', {id: productData.id})
+          onPress={() =>{
+              console.log("Navigating to home menus with productData", productData)
+              navigation.navigate('HomeMenus', {id: productData.id})
+            }
           }>
           <Text style={innerStyles.productName}>{productData.name}</Text>
 

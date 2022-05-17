@@ -27,6 +27,7 @@ import MapScreen from "./src/screen/MapScreen/MapScreen";
 import AppAddAddress from "./src/component/AppAddAddress";
 import AppUpdateAddress from "./src/component/AppUpdateAddress";
 import AppUserBasicProfile from "./src/component/AppUserBasicProfile";
+import AppRestaurantBasicProfile from "./src/component/AppRestaurantBasicProfile";
 import CatalogueScreenLvlThree from "./src/screen/CatalogueScreen/CatalogueScreenLvlThree";
 import CatalogueScreenLvlFour from "./src/screen/CatalogueScreen/CatalogueScreenLvlFour";
 import HomeMenus from "./src/screen/HomeScreen/HomeMenus";
@@ -496,6 +497,14 @@ function ProfileScreenStack() {
         component={AppUserBasicProfile}
       />
      
+     <Stack.Screen
+        options={{
+          headerLeft: () => <AppHeaderBackButton />,
+          title: "Update Profile",
+        }}
+        name="AppRestaurantBasicProfile"
+        component={AppRestaurantBasicProfile}
+      />
     </Stack.Navigator>
   );
 }

@@ -1,10 +1,12 @@
-import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import React, { useState, useEffect } from "react";
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import AppTextTitle from '../../component/AppTextTitle';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {useGetAllOrder} from '../../hooks/Order/useGetOrder';
+import Moment from "moment";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useAppSelector} from '../../store/hooks';
 
 export default function OrderScreen() {
@@ -15,42 +17,90 @@ export default function OrderScreen() {
     userData = JSON?.parse(userState);
   }
 
-  // const orderList: any = useGetAllOrder(userData?.user?.id);
-  const orderList: any = [];
+  const orders: any = [];
+  const [orderList, setOrderList] = useState(orders);
+
   console.log(`orderList useGetAllOrder`, orderList?.data?.orders);
+  useEffect(()=>{
+    getData()
+  },[])
+    
+     function getData(){
+      AsyncStorage.getItem("userKey", (err, result) => {
+        console.log("User key", result);
+        getDataFromBackend(result)
+          .then(function (data) {
+            // if(foodItemList &&  foodItemList.length > 0){
+              setOrderList(data.data)
+            // }
+            console.log("data is", data.data);
+            console.log("data is", data);
+          })
+          .catch((error) => {
+            console.log("error in fetching data is", error);
+          });
+      });
+     }
+     async function getDataFromBackend(tempData: any) {
+      const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getOrders`;
+      console.log("URL in getting groups is: ", url);
+      console.log("tempData: ", tempData);
+      tempData = JSON.parse(tempData);
+      console.log("token: ", tempData.token);
+      console.log("userState: ", userState);
+      try {
+        let response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + tempData.token,
+          },
+        });
+        // response = await response.json();
+        console.log("responseiso", response);
+        console.log("token", tempData);
+        if (response.status === 200) {
+          let data = await response.json();
+          return data;
+        } else {
+          let data = await response.json();
+          throw data;
+        }
+      } catch (e) {
+        console.log("responseiso", e);
+        throw e;
+      }
+    }
   return (
+    <ScrollView>
     <SafeAreaView>
       <View>
         <View style={innerStyles.titleContainer}>
           <AppTextTitle title={'Orders'} />
         </View>
-        {orderList?.data?.orders?.length > 0 ? (
-          orderList?.data?.orders.map(() => {
+        {orderList?.length > 0 ? (
+          orderList?.map((order: any) => {
             return (
               <View style={innerStyles.orderDetailContainer}>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={innerStyles.boldText}>Order Number:</Text>
-                  <Text style={innerStyles.boldText}>123456789</Text>
+                  <Text style={innerStyles.normalText}>{order.order_id}</Text>
                 </View>
                 <View style={{flexDirection: 'row'}}>
-                  <Text style={innerStyles.normalText}>Order Date:</Text>
-                  <Text style={innerStyles.normalText}> 1/1/2020</Text>
-                </View>
-                <Text style={innerStyles.boldText}>Product Details:</Text>
-                <Text style={innerStyles.normalText}>Biker Jacket</Text>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={innerStyles.normalText}> Color:</Text>
-                  <Text style={innerStyles.normalText}> Black</Text>
+                  <Text style={innerStyles.boldText}>Order Date:</Text>
+                  <Text style={innerStyles.normalText}> {Moment(order.created_at).format("DD-MM-YYYY hh:mm:ss")}</Text>
                 </View>
                 <View style={{flexDirection: 'row'}}>
-                  <Text style={innerStyles.normalText}> Size:</Text>
-                  <Text style={innerStyles.normalText}> M</Text>
+                <Text style={innerStyles.boldText}>Order Status:</Text>
+                <Text style={[innerStyles.normalText, {
+                color: order.status == "Rejected" ? "#d12d36" : order.status == "Pending" ? "#24a0ed" : "#429b44"
+                }]}>{order.status}</Text>
                 </View>
                 <View style={{flexDirection: 'row'}}>
-                  <Text style={innerStyles.normalText}> Quantity:</Text>
-                  <Text style={innerStyles.normalText}> 1</Text>
+                  <Text style={innerStyles.boldText}>Restaurant Name:</Text>
+                  <Text style={innerStyles.normalText}> {order.restaurant_name}</Text>
                 </View>
-                <Text style={innerStyles.boldText}>$155.00</Text>
+                
               </View>
             );
           })
@@ -63,6 +113,7 @@ export default function OrderScreen() {
         </TouchableOpacity> */}
       </View>
     </SafeAreaView>
+    </ScrollView>
   );
 }
 
@@ -75,7 +126,6 @@ const innerStyles = StyleSheet.create({
     padding: 17,
     elevation: 5,
     borderWidth: 2,
-    backgroundColor: 'white',
     borderColor: '#FAF9F6',
     shadowColor: '#E2DFD2',
     shadowOpacity: 0.9,
@@ -83,22 +133,19 @@ const innerStyles = StyleSheet.create({
     borderRadius: 8,
   },
   boldText: {
-    color: '#070A0D',
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '400',
     marginVertical: 3,
     marginRight: 3,
   },
   normalText: {
-    color: '#070A0D',
-    fontSize: 12,
+    fontSize: 14,
     marginVertical: 3,
   },
   trackText: {
-    color: '#070A0D',
     fontSize: 18,
     marginTop: 20,
     textAlign: 'center',
     fontWeight: '600',
-  },
+  }
 });

@@ -62,7 +62,7 @@ export default function AppOurFavoritesList  (props: any) {
                     marginLeft: 5,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    backgroundColor: item.selected ? '#429b44' : 'blue'
+                    backgroundColor: item.selected ? '#429b44' : '#24a0ed'
                   },
                 ]}>
                   <Text
@@ -71,7 +71,8 @@ export default function AppOurFavoritesList  (props: any) {
                       styles.ffm,
                       styles.colorWhite,
                       {
-                        // fontWeight: 'bold',
+                        fontWeight: "500",
+                        lineHeight: 26
                       },
                     ]}>
                     {item.name}
