@@ -40,28 +40,6 @@ type addedItemType = {
 };
 const addedItem = {};
 const items: any = [];
-let categories = [
-  {
-    id: 1,
-    name: "Burgers",
-  },
-  {
-    id: 2,
-    name: "Beverages",
-  },
-  {
-    id: 3,
-    name: "Sides",
-  },
-  {
-    id: 4,
-    name: "Desserts",
-  },
-  {
-    id: 5,
-    name: "Deals",
-  },
-];
 type categoryType = {
   id?: any;
   name?: any;
@@ -194,6 +172,7 @@ export default function HomeScreen() {
 useEffect(()=>{
   if(isRestaurantMenuScreen){
     getData()
+    getRestaurantsAndCategoriesFunc()
   } else{
     getRestaurantsAndCategoriesFunc()
   }
@@ -377,7 +356,7 @@ async function getRestaurantsAndCategoriesFunc(){
                   flexDirection: 'row',
                   flexWrap: 'wrap'
                 }}>
-                  {categories.map((category) => {
+                  {categoriesAndRestaurants?.data?.categories.map((category: any) => {
                     return (
                       <View
                     
@@ -442,7 +421,8 @@ async function getRestaurantsAndCategoriesFunc(){
                 addItemToMenu({
                   name: itemName,
                   price: itemPrice,
-                  category: selectedCategory,
+                  category_id: selectedCategory?.id,
+                  image: imagePath
                 })
                 setShowAddItemModal(false)
                 setImagePath("")
@@ -466,17 +446,19 @@ async function getRestaurantsAndCategoriesFunc(){
   }
 
   async function postImage(image_Path: any) {
-    var form_data = new FormData();
-    form_data.append("image", {
-      uri: image_Path,
-      name: "image.jpg",
-      type: "image/jpg",
-      user_id: userState?.customer?.id
-    });
-    console.log("userState", JSON.stringify(userState));
 
-    console.log("form_data", JSON.stringify(form_data));
+   
     try {
+      var form_data = new FormData();
+      form_data.append("image", {
+        uri: image_Path,
+        name: "image.jpg",
+        type: "image/jpg",
+        user_id: userState?.customer?.id
+      });
+      console.log("userState", JSON.stringify(userState));
+  
+      console.log("form_data", JSON.stringify(form_data));
       let response:any = await fetch(base_url + "/uploadImageItem", {
         method: "POST",
         headers: {
@@ -521,8 +503,9 @@ async function getRestaurantsAndCategoriesFunc(){
       });
       let tempList = foodItemList
       tempList.push(item)
-      setFoodItemList(tempList);
-      console.log("list", tempList);
+      setFoodItemList(tempList)
+      console.log("list", tempList)
+      getData()
     } catch(error){
       console.log(error)
     }
@@ -550,6 +533,7 @@ async function getRestaurantsAndCategoriesFunc(){
       });
       setFoodItemList(tempList);
       console.log("list", tempList);
+      getData()
     } catch(error){
       console.log(error)
     }
