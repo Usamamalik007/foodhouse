@@ -221,17 +221,23 @@ export default function ProfileScreen() {
 
 
   function openImagePicker() {
-    ImagePicker.openPicker({
-      width: 63,
-      height: 63,
-      cropping: true,
-    }).then((image: { path: React.SetStateAction<string> }) => {
-      //@ts-ignore
-      setImagePath(image.path);
-      postImage(image.path);
-    }).catch((callBack)=>{ // you forgot to add catch to this promise.
-      console.log(callBack); // Please handle the callBack here.
-     });
+    try{
+      ImagePicker.openPicker({
+        width: 63,
+        height: 63,
+        cropping: true,
+      }).then((image: { path: React.SetStateAction<string> }) => {
+        //@ts-ignore
+        setImagePath(image.path);
+        postImage(image.path);
+      }).catch((callBack)=>{ // you forgot to add catch to this promise.
+        console.log(callBack); // Please handle the callBack here.
+       });
+    } catch(error){
+      console.log(error); // Please handle the callBack here.
+
+    }
+   
   }
   console.log("image path is", imagePath);
   async function postImage(image_Path: any) {
@@ -257,6 +263,7 @@ export default function ProfileScreen() {
       response = await response.json();
       console.log("response is", JSON.stringify(response));
       if (response.statusCode === 200) {
+        setImagePath(response?.data);
         SnackbarSuccess(response.message);
       } else {
         console.log(JSON.stringify(response))

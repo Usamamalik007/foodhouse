@@ -80,11 +80,12 @@ export default function HomeScreen() {
   const [imagePath, setImagePath] = useState<string>("");
 
   function openImagePicker() {
-    ImagePicker.openPicker({
-      width: 63,
-      height: 63,
-      cropping: true,
-    })
+    try{
+      ImagePicker.openPicker({
+        width: 63,
+        height: 63,
+        cropping: true,
+      })
       .then((image: { path: React.SetStateAction<string> }) => {
         //@ts-ignore
         setImagePath(image.path);
@@ -94,6 +95,10 @@ export default function HomeScreen() {
         // you forgot to add catch to this promise.
         console.log(callBack); // Please handle the callBack here.
       });
+    } catch(error){
+      console.log(error); // Please handle the callBack here.
+
+    }
   }
 
   async function selectCategory(index: number) {

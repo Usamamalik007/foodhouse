@@ -79,9 +79,10 @@ export default function OrderScreen() {
           <AppTextTitle title={'Orders'} />
         </View>
         {orderList?.length > 0 ? (
-          orderList?.map((order: any) => {
+          orderList?.map((order: any, index: number) => {
             return (
-              <View style={innerStyles.orderDetailContainer}>
+              <View 
+              key={index} style={innerStyles.orderDetailContainer}>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={innerStyles.boldText}>Order Number:</Text>
                   <Text style={innerStyles.normalText}>{order.order_id}</Text>

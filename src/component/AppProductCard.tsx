@@ -1,18 +1,21 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity, Dimensions} from 'react-native';
+import {StyleSheet, Text, View, LogBox, Image, TouchableOpacity, Dimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from '../assets/css/style';
 import FastImage from 'react-native-fast-image';
 import {useForm} from 'react-hook-form';
-
 import {useAddFavourite} from '../hooks/Favourites/useAddFavourite';
 import {IAddFavouriteRequest} from '../interfaces/IFavouriteData';
 import {useAppSelector} from '../store/hooks';
 import {useRemoveFavourite} from '../hooks/Favourites/useRemoveFavourite';
 import {SnackbarSuccess} from '../utils/SnackBar';
 import {CalculatePercentage} from '../utils/CalculatePercentage';
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 function AppProductCard(props: any) {
   console.log("=================================================props", props)

@@ -1,6 +1,6 @@
 import React, { useState} from 'react';
 
-import {StyleSheet, Text, View, TextInput} from 'react-native';
+import {StyleSheet, Text, View, Image, TextInput} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -10,11 +10,15 @@ import AppSize from '../../component/AppSize';
 import AppColor from '../../component/AppColor';
 import AppProductCard from '../../component/AppProductCard';
 import AppFavourite from '../../component/AppFavourite';
+import {appColors} from '../../utils/colors';
 import AppAddToCart from '../../component/AppAddToCart';
 
 function ProductDetailScreen(props: any) {
   console.log(props)
+  let base_url = "http://ec2-44-201-171-84.compute-1.amazonaws.com:4005";
   const product = props.route.params.props;
+  const imagePath: any = base_url+ product.image;
+  console.log(imagePath)
  
   const [quantity, setQuantity]= useState(0);
 
@@ -30,15 +34,59 @@ function ProductDetailScreen(props: any) {
         style={{
           paddingBottom: 20,
         }}>
-        <AppProductDetailSwiper />
+          <Image
+            source={{
+              uri:
+                imagePath && imagePath.length > 0
+                  ? imagePath
+                  : "https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg",
+            }}
+            style={innerStyles.image}
+            resizeMode={"cover"}
+          />
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text style={innerStyles.productName}>{product.name}</Text>
           <AppFavourite />
         </View>
         <Text style={innerStyles.currentPrice}>PKR {product.amount}</Text>
         <Text style={innerStyles.productName}>Select amount</Text>
+        <View
+      style={[
+        {
+          flexDirection: 'row',
+          height: 40,
+          borderWidth: 1,
+          marginVertical: 8,
+          borderColor: appColors.inputBorder,
+          alignItems: 'center',
+          borderRadius:5
+        },
+      ]}>
+      <TextInput
+        placeholderTextColor="#B9B9B9"
+        keyboardType="numeric"
+        onChangeText={(text: any)=> {setQuantity(text)}}
+        style={[
+          {
+            fontSize: 18,
+            padding: 10,
+            flex: 1,
+            fontFamily: 'OpenSans-Regular',
+            color: '#000000',
+          }
+        ]}
+      />
+    </View>
         <TextInput 
-   style={{borderWidth: 1}}
+   style={[
+    {
+      fontSize: 18,
+      padding: 10,
+      flex: 1,
+      fontFamily: 'OpenSans-Regular',
+      color: '#000000',
+    }
+  ]}
    keyboardType='numeric'
    onChangeText={(text: any)=> {setQuantity(text)}}
    maxLength={10}  //setting limit of input
@@ -50,17 +98,6 @@ function ProductDetailScreen(props: any) {
           horizontalPadding={8}
           fontWeight={'700'}
         /> */}
-        <View style={innerStyles.descriptionContainer}>
-          <Text style={innerStyles.descriptionTittle}>Description</Text>
-          <Text numberOfLines={2} style={innerStyles.description}>
-            {product.description}
-          </Text>
-          {/* <MaterialIcons
-            name="expand-more"
-            size={25}
-            style={innerStyles.expandMore}
-          /> */}
-        </View>
         {/* <View>
           <Text style={innerStyles.relatedProducts}>Related Products</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -89,6 +126,13 @@ const innerStyles = StyleSheet.create({
   mainContainer: {
     marginHorizontal: 10,
     borderRadius: 8,
+  },
+  slide: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#9DD6EB',
+    width: '100%',
   },
   image: {
     height: 230,
@@ -125,20 +169,6 @@ const innerStyles = StyleSheet.create({
     lineHeight: 19,
     fontSize: 16,
     textDecorationLine: 'line-through',
-  },
-  descriptionContainer: {
-    marginVertical: 10,
-    paddingVertical: 10,
-  },
-  descriptionTittle: {
-    fontWeight: '500',
-    fontSize: 19,
-    color: '#34283E',
-    paddingBottom: 5,
-  },
-  description: {
-    fontSize: 14,
-    color: '#605A65',
   },
   expandMore: {
     alignSelf: 'center',
