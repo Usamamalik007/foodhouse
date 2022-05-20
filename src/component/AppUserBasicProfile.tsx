@@ -24,6 +24,10 @@ const schema = yup.object().shape({
     .string()
     .required('Please enter your Last Name')
     .min(3, 'Last Name should be 3 character long'),
+    address: yup
+    .string()
+    .required('Please enter your address')
+    .min(8, 'Address should be at least 8 characters long'),
   mobileno: yup
     .string()
     .required('Please enter your Phone Number')
@@ -40,6 +44,7 @@ function AppUserBasicProfile(props: any) {
     resolver: yupResolver(schema),
     defaultValues: {
       fname: props?.route?.params?.fname,
+      address: props?.route?.params?.address,
       lname: props?.route?.params?.lname,
       mobileno: props?.route?.params?.mobileno,
     },
@@ -64,6 +69,7 @@ function AppUserBasicProfile(props: any) {
         let requestBody = {
             fname: values.fname,
             lname: values.lname,
+            address: values.address,
             mobileno: values.mobileno,
             password: props?.route?.params?.password
         }
@@ -133,6 +139,21 @@ function AppUserBasicProfile(props: any) {
             }}
           />
 
+          <AppTextInput
+            name="address"
+            outerViewProps={{style: {height: 45}}}
+            control={control}
+            textInputProps={{
+              placeholder: 'Address',
+              style: {fontSize: 14, color: 'black', backgroundColor: 'white'},
+            }}
+          />
+
+          {errors.address && (
+            <Text style={[innerStyles.errorField, {marginBottom: 5}]}>
+              {errors.address['message']}
+            </Text>
+          )}
           {errors.lname && (
             <Text style={innerStyles.errorField}>
               {errors.lname['message']}

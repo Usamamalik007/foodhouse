@@ -69,6 +69,7 @@ function RegistrationScreen() {
     registerUserRequest.mutate({
       fname: values.first_name,
       lname: values.last_name,
+      address: values.address,
       mobileno: values.mobile_no,
       email: values.email.toLowerCase(),
       password: values.password.trim(),
@@ -77,7 +78,7 @@ function RegistrationScreen() {
     });
   });
 
-  const registerUserRequest = useRegisterUser({
+  const registerUserRequest: any = useRegisterUser({
     async onSuccess(res) {
       console.log(res)
       if (res.statusCode == 200){
@@ -142,6 +143,14 @@ function RegistrationScreen() {
             </Text>
           )}
 
+          <AppTextInput
+            name="address"
+            control={control}
+            textInputProps={{
+              placeholder: 'Address',
+              style: {fontSize: 12,},
+            }}
+          />
           <AppTextInput
             name="mobile_no"
             control={control}
