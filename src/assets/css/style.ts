@@ -6,7 +6,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-
+  activityContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 70
+ },
+ activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 80
+ },
   // alignitems
   itc: {
     alignItems: 'center',
@@ -756,9 +767,9 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   favourite: {
-    padding: 8,
+    padding: 5,
     backgroundColor: '#FFFFFF',
-    width: 45,
+    width: 30,
     position: 'absolute',
     right: 5,
     bottom: 80,
@@ -766,7 +777,21 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 150 / 2,
+    borderRadius: 100 / 2,
+  },
+  
+  bestSeller: {
+    padding: 5,
+    backgroundColor: '#FFFFFF',
+    width: 30,
+    position: 'absolute',
+    left: 5,
+    top: 5,
+    zIndex: 1000,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 100 / 2,
   },
 });
 

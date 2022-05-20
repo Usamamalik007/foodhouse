@@ -1,6 +1,7 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React, { useState, useEffect } from "react";
 import {SafeAreaView} from 'react-native-safe-area-context';
+import StarRating from 'react-native-star-rating';
 
 import AppTextTitle from '../../component/AppTextTitle';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
@@ -8,13 +9,15 @@ import {useGetAllOrder} from '../../hooks/Order/useGetOrder';
 import Moment from "moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useAppSelector} from '../../store/hooks';
+import { SnackbarError, SnackbarSuccess } from '../../utils/SnackBar';
 
 export default function OrderScreen() {
-  const userState: any = useAppSelector(state => state?.user?.user);
+  let userState: any = useAppSelector((state) => state?.user);
   let userData: any;
-  if (userState?.customer) {
+  if (typeof userState.user != "object") {
+    userState = JSON.parse(userState.user);
   } else {
-    userData = JSON?.parse(userState);
+    userState = userState.user;
   }
 
   const orders: any = [];
@@ -28,7 +31,7 @@ export default function OrderScreen() {
      function getData(){
       AsyncStorage.getItem("userKey", (err, result) => {
         console.log("User key", result);
-        getDataFromBackend(result)
+        getDataFromBackend()
           .then(function (data) {
             // if(foodItemList &&  foodItemList.length > 0){
               setOrderList(data.data)
@@ -41,24 +44,52 @@ export default function OrderScreen() {
           });
       });
      }
-     async function getDataFromBackend(tempData: any) {
+     
+    async function onStarRatingPress(id: number, rating: number){
+      try{
+        console.log(userState?.token)
+        const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/setRating`;
+        const requestBody = {
+          order_id: id,
+          rating: rating
+        }
+        console.log(requestBody)
+        let response: any = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + userState?.token,
+          },
+          body: JSON.stringify(requestBody)
+        });
+        response = await response.json();
+        if (response.statusCode === 200) {
+          SnackbarSuccess(response.message);
+          getData()
+          return response;
+        } else {
+          SnackbarError(response.message);
+          throw response;
+        }
+      } catch(error){
+        console.log(error)
+      }
+     
+    } 
+     async function getDataFromBackend() {
       const url = `http://ec2-44-201-171-84.compute-1.amazonaws.com:4005/getOrders`;
       console.log("URL in getting groups is: ", url);
-      console.log("tempData: ", tempData);
-      tempData = JSON.parse(tempData);
-      console.log("token: ", tempData.token);
       console.log("userState: ", userState);
       try {
         let response = await fetch(url, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + tempData.token,
+            Authorization: "Bearer " + userState?.token,
           },
         });
         // response = await response.json();
         console.log("responseiso", response);
-        console.log("token", tempData);
         if (response.status === 200) {
           let data = await response.json();
           return data;
@@ -70,7 +101,7 @@ export default function OrderScreen() {
         console.log("responseiso", e);
         throw e;
       }
-    }
+    }  
   return (
     <ScrollView>
     <SafeAreaView>
@@ -101,6 +132,16 @@ export default function OrderScreen() {
                   <Text style={innerStyles.boldText}>Restaurant Name:</Text>
                   <Text style={innerStyles.normalText}> {order.restaurant_name}</Text>
                 </View>
+                <View style={{flexDirection: 'row'}}>
+                </View>
+                {order.status === 'Accepted' ? (<StarRating
+                  starSize = {30}
+                  maxStars={5}
+                  containerStyle={{width: 200, marginTop: 10, alignSelf: 'center'}}
+                  rating={order.rating}
+                  disabled={order.rating}
+                  selectedStar={(rating: any) => onStarRatingPress(order.order_id, rating)}
+                />) : null}
                 
               </View>
             );

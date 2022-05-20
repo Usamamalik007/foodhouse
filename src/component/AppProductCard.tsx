@@ -67,6 +67,17 @@ function AppProductCard(props: any) {
             style={innerStyles.image}
             resizeMode={'cover'}
           />
+          
+          {props.bestSeller == true? <View style={styles.bestSeller}>
+              <Ionicons
+                name={
+                  'star'
+                }
+                size={20}
+                color='#1dabd1'
+              />
+          </View> : null
+          }
           <View style={styles.favourite}>
  
             <TouchableOpacity
@@ -76,7 +87,7 @@ function AppProductCard(props: any) {
                 name={
                   props.is_wishlist == true ? 'heart' : 'heart-outline'
                 }
-                size={25}
+                size={20}
                 color={props.is_wishlist == true ? '#CE3E3E' : '#373737' }
               />
             </TouchableOpacity>

@@ -81,10 +81,9 @@ export default function HomeScreen() {
 
   function openImagePicker() {
     try{
+      
       ImagePicker.openPicker({
-        width: 63,
-        height: 63,
-        cropping: true,
+        cropping: true
       })
       .then((image: { path: React.SetStateAction<string> }) => {
         //@ts-ignore
@@ -599,8 +598,9 @@ async function getRestaurantsAndCategoriesFunc(){
                 }}
               >
                 
-                <View style={{flexDirection: 'row',alignItems: 'flex-end', marginRight: 5,  marginTop: 10, 
-    justifyContent: 'flex-end'}}>
+                <View style={{flexDirection: 'row', marginRight: 5,  marginTop: 10,}}>
+                {item.bestSeller == true? <View style = {{alignSelf: 'flex-start'}}><Ionicons style={{ marginLeft: 5, marginTop: 5, color: "#1dabd1"}} name="star" size={20} /></View> : null}
+                <View style={{alignSelf: 'flex-end', marginLeft: 'auto'}}>
                 <TouchableOpacity
                   onPress={() => {
                     removeFromList(item)
@@ -611,6 +611,7 @@ async function getRestaurantsAndCategoriesFunc(){
   removeFromList(item)
 }}  name="close-outline" size={30} color={appColors.darkGrey} />
                   </TouchableOpacity>
+                  </View>
 </View>
 
                   <View style={{flexDirection: "row",alignItems: "center", justifyContent: 'space-between', marginLeft: 20, marginBottom: 35}}>

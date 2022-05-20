@@ -103,6 +103,7 @@ async function getRestaurantMenu(){
                         restaurantId={restaurantId}
                         amount={individualProduct.price}
                         is_wishlist={individualProduct.is_favourite}
+                        bestSeller={individualProduct.bestSeller}
                         image={individualProduct.image}
                         selectFavourite = {selectFavourite}
                       />
