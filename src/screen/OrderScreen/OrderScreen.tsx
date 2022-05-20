@@ -139,7 +139,8 @@ export default function OrderScreen() {
                   maxStars={5}
                   containerStyle={{width: 200, marginTop: 10, alignSelf: 'center'}}
                   rating={order.rating}
-                  disabled={order.rating}
+                  fullStarColor="#FF9529"
+                  disabled={order.rating ? true : false}
                   selectedStar={(rating: any) => onStarRatingPress(order.order_id, rating)}
                 />) : null}
                 

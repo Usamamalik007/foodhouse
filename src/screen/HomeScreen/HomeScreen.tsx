@@ -10,6 +10,7 @@ import {
   TouchableOpacityBase,
   Modal,
   TextInput,
+  ActivityIndicator,
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -78,17 +79,19 @@ export default function HomeScreen() {
 
     
   const [imagePath, setImagePath] = useState<string>("");
+  const [loader, setLoader] = useState<boolean>(false);
 
   function openImagePicker() {
     try{
-      
       ImagePicker.openPicker({
         cropping: true
       })
       .then((image: { path: React.SetStateAction<string> }) => {
         //@ts-ignore
+        setLoader(true)
         setImagePath(image.path);
         postImage(image.path);
+
       })
       .catch((callBack) => {
         // you forgot to add catch to this promise.
@@ -248,7 +251,11 @@ async function getRestaurantsAndCategoriesFunc(){
             >
               Add Item
             </Text>
-            <View
+            {
+              loader ? 
+              <ActivityIndicator
+              /> :<View> 
+                <View
               style={{
                 marginTop: 10,
               }}
@@ -443,6 +450,9 @@ async function getRestaurantsAndCategoriesFunc(){
                 Add to menu
               </Text>
             </TouchableOpacity>
+              </View>
+            }
+            
           </View>
         </Modal>
       )
@@ -474,6 +484,7 @@ async function getRestaurantsAndCategoriesFunc(){
       })
       response = await response.json();
       console.log("response is", JSON.stringify(response));
+      setLoader(false)
       if (response.statusCode === 200) {
         setImagePath(response?.data)  
         SnackbarSuccess(response.message);
