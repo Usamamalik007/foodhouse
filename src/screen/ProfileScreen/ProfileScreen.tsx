@@ -118,13 +118,8 @@ export default function ProfileScreen() {
   console.log("profileList in profiles2", profileList)
 
   
-  let userData: any;
-  if (userState?.customer) {
-  } else {
-    userData = JSON?.parse(userState);
-  }
   const dispatch = useDispatch();
-  var getProfile: any = useGetProfile(userData?.user?.id);
+  var getProfile: any = useGetProfile(userState?.user?.id);
 
   console.log('getProfile ', JSON.stringify(getProfile?.data?.data[0]))
 
@@ -203,7 +198,7 @@ export default function ProfileScreen() {
     console.log(`values handleSubmit`, values);
     changePhoneNumber.mutate({
       phoneNumber: values?.phoneno.toString(),
-      userId: userData?.user?.id.toString(),
+      userId: userState?.user?.id.toString(),
     });
   });
   const changePhoneNumber = useUpdatePhoneNo({
@@ -223,8 +218,6 @@ export default function ProfileScreen() {
   function openImagePicker() {
     try{
       ImagePicker.openPicker({
-        width: 63,
-        height: 63,
         cropping: true,
       }).then((image: { path: React.SetStateAction<string> }) => {
         //@ts-ignore
@@ -247,7 +240,8 @@ export default function ProfileScreen() {
       name: "image.jpg",
       type: "image/jpg",
     });
-    form_data.append("user_id", userState?.customer?.id)
+    form_data.append("user_id", userState?.customer?.user_id)
+    console.log("=u================================",userState)
 
     console.log("form_data", JSON.stringify(form_data));
     try {
